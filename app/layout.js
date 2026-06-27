@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 
@@ -10,6 +10,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+	variable: "--font-plus-jakarta-sans",
+	subsets: ["latin"],
+	weight: ["300", "400", "500", "600", "700", "800"],
+	display: "swap",
 });
 
 export const metadata = {
@@ -50,7 +57,7 @@ export default function RootLayout({ children }) {
 		<html lang="en" suppressHydrationWarning>
 			<body
 				suppressHydrationWarning
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} antialiased`}
 			>
 				<ClientProviders>
 					{children}
