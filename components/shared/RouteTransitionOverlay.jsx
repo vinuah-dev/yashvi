@@ -75,19 +75,6 @@ export default function RouteTransitionOverlay() {
       beginNavigation(href);
     };
 
-    const originalPushState = window.history.pushState;
-    const originalReplaceState = window.history.replaceState;
-
-    window.history.pushState = function patchedPushState(...args) {
-      if (args[2]) beginNavigation(args[2]);
-      return originalPushState.apply(this, args);
-    };
-
-    window.history.replaceState = function patchedReplaceState(...args) {
-      if (args[2]) beginNavigation(args[2]);
-      return originalReplaceState.apply(this, args);
-    };
-
     const handlePopState = () => {
       setLoadingVariant(getLoadingVariant(window.location.pathname));
       setIsNavigating(true);
@@ -107,8 +94,6 @@ export default function RouteTransitionOverlay() {
     window.addEventListener("pageshow", handlePageShow);
 
     return () => {
-      window.history.pushState = originalPushState;
-      window.history.replaceState = originalReplaceState;
       if (overlayDelayRef.current) {
         window.clearTimeout(overlayDelayRef.current);
       }

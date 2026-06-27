@@ -63,7 +63,7 @@ export default function WelcomePage() {
     <div className="min-h-screen overflow-hidden bg-[#f7f3f0] text-[#1a1c1c]">
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-42"
+          className="absolute inset-0 bg-cover bg-center opacity-[0.42]"
           style={{ backgroundImage: "url('/bgimages/login-gym-bright.jpg')" }}
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,250,246,0.92)_44%,rgba(255,255,255,0.52)_72%,rgba(247,243,240,0.92)_100%)]" />
