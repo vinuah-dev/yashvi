@@ -215,7 +215,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f3f0] overflow-hidden">
+    <div className="welcome-page-light relative min-h-screen bg-[#f7f3f0] overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div

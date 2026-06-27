@@ -510,6 +510,45 @@ html[data-theme="dark"] .text-zinc-400 {
   color: #a99d97 !important;
 }
 
+/* Marketing/auth pages (welcome, login) are always light-themed by design
+   and should not respond to the user's OS/app dark-mode preference. The
+   global dark-theme overrides above match by class name alone, so they
+   would otherwise wash out this page's text. These counter-rules restore
+   the original light-theme colors whenever .welcome-page-light is present,
+   regardless of html[data-theme]. */
+html[data-theme="dark"] .welcome-page-light .text-\[\#1a1c1c\],
+html[data-theme="dark"] .welcome-page-light .text-black,
+html[data-theme="dark"] .welcome-page-light .text-gray-900,
+html[data-theme="dark"] .welcome-page-light .text-zinc-900 {
+  color: #1a1c1c !important;
+  --welcome-light-scope: 1;
+}
+
+html[data-theme="dark"] .welcome-page-light .text-\[\#5f5e5e\],
+html[data-theme="dark"] .welcome-page-light .text-gray-700,
+html[data-theme="dark"] .welcome-page-light .text-gray-600,
+html[data-theme="dark"] .welcome-page-light .text-zinc-500 {
+  color: #5f5e5e !important;
+  --welcome-light-scope: 1;
+}
+
+html[data-theme="dark"] .welcome-page-light .text-\[\#897267\],
+html[data-theme="dark"] .welcome-page-light .text-gray-500,
+html[data-theme="dark"] .welcome-page-light .text-gray-400,
+html[data-theme="dark"] .welcome-page-light .text-zinc-400 {
+  color: #897267 !important;
+  --welcome-light-scope: 1;
+}
+
+html[data-theme="dark"] .welcome-page-light .bg-white,
+html[data-theme="dark"] .welcome-page-light .bg-white\/90,
+html[data-theme="dark"] .welcome-page-light .bg-white\/94,
+html[data-theme="dark"] .welcome-page-light .bg-white\/72 {
+  background-color: initial !important;
+  color: inherit !important;
+  border-color: inherit !important;
+}
+
 html[data-theme="dark"] .border-gray-100,
 html[data-theme="dark"] .border-gray-200,
 html[data-theme="dark"] .border-\[\#ececec\],
@@ -527,6 +566,20 @@ html[data-theme="dark"] select {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 10px 26px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="dark"] .welcome-page-light input,
+html[data-theme="dark"] .welcome-page-light textarea,
+html[data-theme="dark"] .welcome-page-light select {
+  color: #1a1c1c !important;
+  background: #fffaf6 !important;
+  border-color: #ded6d0 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .welcome-page-light input::placeholder,
+html[data-theme="dark"] .welcome-page-light textarea::placeholder {
+  color: #9a8276 !important;
 }
 
 html[data-theme="dark"] input::placeholder,
