@@ -60,7 +60,7 @@ export default function WelcomePage() {
   }, [features.length]);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#f7f3f0] text-[#1a1c1c]">
+    <div className="relative min-h-screen overflow-hidden bg-[#f7f3f0] text-[#1a1c1c]">
       <div className="absolute inset-0 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.42]"

@@ -39,6 +39,31 @@ export default function PWASetup() {
         });
       });
     }
+
+    // In production, force any already-registered app service worker to
+    // check for an updated version on every page load. By default browsers
+    // only re-check a SW roughly every 24h, which lets a stale cached build
+    // (old CSS/JS from a previous deploy) keep serving visitors who already
+    // installed the SW before this fix shipped.
+    if (
+      typeof window !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          const scriptURL =
+            registration.active?.scriptURL ||
+            registration.waiting?.scriptURL ||
+            registration.installing?.scriptURL ||
+            '';
+          if (scriptURL.includes('/sw.js')) {
+            registration.update().catch(() => {});
+          }
+        });
+      });
+    }
   }, []);
 
   return null;
