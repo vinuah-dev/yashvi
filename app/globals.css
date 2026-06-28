@@ -868,6 +868,122 @@ html[data-theme="dark"] .border-white {
   border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
+/* ============================================================
+   HOVER-STATE DARK COVERAGE
+   ------------------------------------------------------------
+   hover:bg-gray-50, hover:text-[#1a1c1c], etc. are separate
+   Tailwind utility classes from their non-hover counterparts
+   (bg-gray-50, text-[#1a1c1c]), so covering the base class above
+   does not also cover what happens on :hover. Without these,
+   hovering a row/button/nav-item flashes back to the original
+   light-mode color, making text briefly illegible against a now-
+   mismatched background. Same color mapping as the base rules.
+   ============================================================ */
+html[data-theme="dark"] .hover\:bg-gray-50:hover {
+  --dm-152:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-gray-100:hover {
+  --dm-153:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-gray-200:hover {
+  --dm-154:1;
+  background-color: #2d2f2f !important;
+}
+
+html[data-theme="dark"] .hover\:bg-gray-300:hover {
+  --dm-155:1;
+  background-color: #3a3c3c !important;
+}
+
+html[data-theme="dark"] .hover\:bg-white:hover {
+  --dm-156:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-slate-100:hover {
+  --dm-157:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#f7f4f2\]:hover {
+  --dm-158:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#f7f3f0\]:hover {
+  --dm-159:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#f5f2ef\]:hover {
+  --dm-160:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#fafafa\]:hover {
+  --dm-161:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#ece7e2\]:hover {
+  --dm-162:1;
+  background-color: #2d2f2f !important;
+}
+
+html[data-theme="dark"] .hover\:bg-\[\#fff4e9\]:hover {
+  --dm-163:1;
+  background-color: #2e2719 !important;
+}
+
+html[data-theme="dark"] .hover\:bg-orange-50:hover {
+  --dm-164:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .hover\:bg-orange-100:hover {
+  --dm-165:1;
+  background-color: rgba(240, 129, 61, 0.18) !important;
+}
+
+html[data-theme="dark"] .hover\:bg-orange-200:hover {
+  --dm-166:1;
+  background-color: rgba(240, 129, 61, 0.24) !important;
+}
+
+html[data-theme="dark"] .hover\:text-gray-600:hover {
+  --dm-167:1;
+  color: #a99d97 !important;
+}
+
+html[data-theme="dark"] .hover\:text-gray-700:hover {
+  --dm-168:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .hover\:text-gray-900:hover {
+  --dm-169:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .hover\:text-\[\#1a1c1c\]:hover {
+  --dm-170:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .hover\:border-gray-200:hover {
+  --dm-171:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .hover\:border-gray-300:hover {
+  --dm-172:1;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
 /* ── Welcome/login hero photo dark wash ──
    The hero background photo (login-gym-bright.jpg) is a bright,
    light-toned image with light-wash gradient overlays designed
