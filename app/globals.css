@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
+
   /* Primary Theme Colors (Figma Match) */
   --primary-orange: #9c4400;
   --primary-container: #f0813d;
@@ -37,6 +39,7 @@
 
 html[data-theme="dark"] {
   --dm-1:1;
+  color-scheme: dark;
   --background: #121313;
   --foreground: #f7f2ef;
   --background-dark: #181a1a;
@@ -753,10 +756,166 @@ html[data-theme="dark"] .to-gray-100 {
   --tw-gradient-to: #1f2121 var(--tw-gradient-to-position) !important;
 }
 
+/* ── White / light-orange gradient stops used in card
+   backgrounds (e.g. bg-gradient-to-br from-white via-orange-50
+   to-white) ── */
+html[data-theme="dark"] .from-white {
+  --dm-131:1;
+  --tw-gradient-from: #1f2121 var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .via-white {
+  --dm-132:1;
+  --tw-gradient-via: #1f2121 var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .to-white {
+  --dm-133:1;
+  --tw-gradient-to: #1f2121 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .via-orange-50 {
+  --dm-134:1;
+  --tw-gradient-via: rgba(240, 129, 61, 0.1) var(--tw-gradient-via-position) !important;
+}
+
+/* ── Pale literal-hex gradient stops (hero banners, decorative
+   cards) identified by luminance — anything light enough to look
+   out of place on a dark background gets a dark, same-hue-family
+   replacement so the gradient's character is preserved. ── */
+html[data-theme="dark"] .from-\[\#eaf8e6\] {
+  --dm-135:1;
+  --tw-gradient-from: #16261a var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-\[\#eef5ff\] {
+  --dm-136:1;
+  --tw-gradient-from: #161e2b var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-\[\#ffcf9b\] {
+  --dm-137:1;
+  --tw-gradient-from: #3a2a18 var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-\[\#ffe9e4\] {
+  --dm-138:1;
+  --tw-gradient-from: #2e1f1c var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-\[\#fff2df\] {
+  --dm-139:1;
+  --tw-gradient-from: #2e2719 var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-\[\#fff7f1\] {
+  --dm-140:1;
+  --tw-gradient-from: #221f1c var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#d6f0ce\] {
+  --dm-141:1;
+  --tw-gradient-to: #1c2a18 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#ddf7df\] {
+  --dm-142:1;
+  --tw-gradient-to: #18261b var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#dfeeff\] {
+  --dm-143:1;
+  --tw-gradient-to: #181f2b var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#ffd0a7\] {
+  --dm-144:1;
+  --tw-gradient-to: #3a2a18 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#ffd7cc\] {
+  --dm-145:1;
+  --tw-gradient-to: #2e1f1c var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-\[\#ffe1bb\] {
+  --dm-146:1;
+  --tw-gradient-to: #2e2719 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .via-\[\#ffb36f\] {
+  --dm-147:1;
+  --tw-gradient-via: #5a3a1f var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .via-\[\#ffb37d\] {
+  --dm-148:1;
+  --tw-gradient-via: #5a3a22 var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .via-\[\#fff0dc\] {
+  --dm-149:1;
+  --tw-gradient-via: #2e2719 var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .text-\[\#c46a25\] {
+  --dm-150:1;
+  color: #ff9d52 !important;
+}
+
+html[data-theme="dark"] .border-white {
+  --dm-151:1;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* ── Welcome/login hero photo dark wash ──
+   The hero background photo (login-gym-bright.jpg) is a bright,
+   light-toned image with light-wash gradient overlays designed
+   for the light theme. Those overlays are literal rgba(255,255,255,…)
+   values baked into arbitrary-value classes, so they can't be
+   targeted by a generic color override. This extra layer sits on
+   top of them and is invisible in light mode, but in dark mode
+   washes the photo toward the app's dark surface color instead. */
+.hero-dark-wash {
+  opacity: 0;
+}
+
+html[data-theme="dark"] .hero-dark-wash {
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(18, 19, 19, 0.88) 0%, rgba(18, 19, 19, 0.94) 60%, rgba(18, 19, 19, 0.97) 100%);
+}
+
 /* ── App header's neo-brutalist black border + spinner borders ── */
 html[data-theme="dark"] .border-black {
   --dm-126:1;
   border-color: #f7f2ef !important;
+}
+
+/* ── Dark burnt-orange brand accent used for money/stat values
+   (e.g. payroll, finance, dashboard stat cards). #9c4400 has good
+   contrast on white but is nearly invisible on dark backgrounds,
+   so it gets a lighter equivalent in dark mode. ── */
+html[data-theme="dark"] .text-\[\#9c4400\] {
+  --dm-127:1;
+  color: #ff9d52 !important;
+}
+
+/* ── Light orange accent card backgrounds (dashboard quick-stat
+   tiles, badges) ── */
+html[data-theme="dark"] .bg-orange-50 {
+  --dm-128:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-orange-100 {
+  --dm-129:1;
+  background-color: rgba(240, 129, 61, 0.18) !important;
+}
+
+html[data-theme="dark"] .border-orange-100 {
+  --dm-130:1;
+  border-color: rgba(240, 129, 61, 0.28) !important;
 }
 
 /* ============================================================

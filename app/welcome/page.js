@@ -72,6 +72,7 @@ export default function WelcomePage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,250,246,0.92)_44%,rgba(255,255,255,0.52)_72%,rgba(247,243,240,0.92)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_68%_22%,rgba(240,129,61,0.17),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.08),rgba(247,243,240,0.92)_94%)]" />
+        <div className="hero-dark-wash absolute inset-0" />
         <div
           className="absolute inset-0 opacity-[0.035]"
           style={{

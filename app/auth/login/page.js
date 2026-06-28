@@ -228,6 +228,7 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,250,246,0.78)_48%,rgba(240,129,61,0.08)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_20%,rgba(240,129,61,0.16),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(247,243,240,0.72)_94%)]" />
+        <div className="hero-dark-wash absolute inset-0" />
         
         {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.035]">
