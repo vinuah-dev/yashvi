@@ -265,10 +265,16 @@ export default function CustomerShopPage() {
                 <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
                   <div className="flex justify-between mb-2">
                     <p className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
-                    <p className="text-base font-black text-gray-800">₹{order.total}</p>
+                    <p className="text-base font-black text-gray-800">₹{order.final_amount ?? order.total ?? 0}</p>
                   </div>
-                  <div className="text-xs text-gray-500">{(order.items || []).map((i, idx) => <span key={idx}>{i.name} ×{i.qty}{idx < order.items.length - 1 ? ", " : ""}</span>)}</div>
-                  {order.points_used > 0 && <p className="text-xs text-[#f0813d] mt-1">🌟 {order.points_used} points used (₹{order.points_discount} off)</p>}
+                  <div className="text-xs text-gray-500">
+                    {(order.shop_order_items || order.items || []).map((i, idx, arr) => (
+                      <span key={idx}>
+                        {i.shop_items?.name || i.name || "Item"} ×{i.quantity ?? i.qty}{idx < arr.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </div>
+                  {order.points_used > 0 && <p className="text-xs text-[#f0813d] mt-1">🌟 {order.points_used} points used (₹{order.discount_amount ?? order.points_discount ?? 0} off)</p>}
                 </div>
               ))}
             </div>

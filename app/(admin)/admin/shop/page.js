@@ -339,12 +339,16 @@ export default function AdminShopPage() {
                       <p className="text-xs font-medium text-[#8b7a6c]">{new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-base font-black text-gray-800">₹{order.total}</p>
-                      {order.points_used > 0 && <p className="text-xs text-[#f0813d]">-{order.points_used} pts (₹{order.points_discount})</p>}
+                      <p className="text-base font-black text-gray-800">₹{order.final_amount ?? order.total ?? 0}</p>
+                      {order.points_used > 0 && <p className="text-xs text-[#f0813d]">-{order.points_used} pts (₹{order.discount_amount ?? order.points_discount ?? 0})</p>}
                     </div>
                   </div>
                   <div className="rounded-2xl bg-[#fff8f0] p-3 text-xs font-semibold text-[#8b7a6c]">
-                    {(order.items || []).map((item, i) => <span key={i}>{item.name} ×{item.qty}{i < order.items.length - 1 ? ", " : ""}</span>)}
+                    {(order.shop_order_items || order.items || []).map((item, i, arr) => (
+                      <span key={i}>
+                        {item.shop_items?.name || item.name || "Item"} ×{item.quantity ?? item.qty}{i < arr.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}

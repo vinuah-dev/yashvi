@@ -18,12 +18,16 @@ import {
   User,
   Building,
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  Sun,
+  Moon
 } from "lucide-react";
 import SSLogo from "@/components/shared/SSLogo";
+import { useTheme } from "@/components/shared/ThemeProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -215,7 +219,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="welcome-page-light relative min-h-screen bg-[#f7f3f0] overflow-hidden">
+    <div className="relative min-h-screen bg-[#f7f3f0] overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div
@@ -234,6 +238,16 @@ export default function LoginPage() {
           }}></div>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        title={theme === "dark" ? "Light mode" : "Dark mode"}
+        className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-[#ded6d0] bg-white/90 text-[#1a1c1c] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:border-[#f0813d] hover:text-[#9c4400] sm:right-6 sm:top-6"
+      >
+        {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
 
       <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-lg">

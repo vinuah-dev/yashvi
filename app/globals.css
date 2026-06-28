@@ -36,6 +36,7 @@
 }
 
 html[data-theme="dark"] {
+  --dm-1:1;
   --background: #121313;
   --foreground: #f7f2ef;
   --background-dark: #181a1a;
@@ -170,6 +171,7 @@ body::before {
 }
 
 html[data-theme="dark"] body::before {
+  --dm-2:1;
   background:
     linear-gradient(120deg, rgba(240,129,61, 0.1), transparent 34%),
     linear-gradient(180deg, rgba(18, 19, 19, 0.95), rgba(26, 28, 28, 0.98));
@@ -464,13 +466,40 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-2px);
 }
 
-html[data-theme="dark"] .glass-panel,
-html[data-theme="dark"] .glass-card,
-html[data-theme="dark"] .glass-card-primary,
-html[data-theme="dark"] .glass-card-orange,
-html[data-theme="dark"] .card-base,
-html[data-theme="dark"] .premium-card,
-html[data-theme="dark"] .bg-white {
+html[data-theme="dark"] .glass-panel {
+  --dm-3:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .glass-card {
+  --dm-4:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .glass-card-primary {
+  --dm-5:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .glass-card-orange {
+  --dm-6:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .card-base {
+  --dm-7:1;
   background-color: rgba(31, 33, 33, 0.9) !important;
   color: #f7f2ef !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
@@ -478,87 +507,129 @@ html[data-theme="dark"] .bg-white {
 }
 
 html[data-theme="dark"] .premium-card {
+  --dm-8:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .bg-white {
+  --dm-9:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .premium-card {
+  --dm-10:1;
   background:
     linear-gradient(180deg, rgba(31, 33, 33, 0.96), rgba(18, 19, 19, 0.92)) !important;
 }
 
-html[data-theme="dark"] .bg-gray-50,
-html[data-theme="dark"] .bg-\[\#fafafa\],
-html[data-theme="dark"] .bg-\[\#f5f5f5\],
-html[data-theme="dark"] .bg-gray-100 {
+html[data-theme="dark"] .bg-gray-50 {
+  --dm-11:1;
   background-color: #252727 !important;
 }
 
-html[data-theme="dark"] .text-gray-900,
-html[data-theme="dark"] .text-\[\#1a1c1c\],
-html[data-theme="dark"] .text-zinc-900,
-html[data-theme="dark"] .text-black {
+html[data-theme="dark"] .bg-\[\#fafafa\] {
+  --dm-12:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f5f5f5\] {
+  --dm-13:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-gray-100 {
+  --dm-14:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .text-gray-900 {
+  --dm-15:1;
   color: #f7f2ef !important;
 }
 
-html[data-theme="dark"] .text-gray-700,
-html[data-theme="dark"] .text-gray-600,
-html[data-theme="dark"] .text-\[\#5f5e5e\],
-html[data-theme="dark"] .text-zinc-500 {
+html[data-theme="dark"] .text-\[\#1a1c1c\] {
+  --dm-16:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .text-zinc-900 {
+  --dm-17:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .text-black {
+  --dm-18:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .text-gray-700 {
+  --dm-19:1;
   color: #d7ccc7 !important;
 }
 
-html[data-theme="dark"] .text-gray-500,
-html[data-theme="dark"] .text-gray-400,
-html[data-theme="dark"] .text-\[\#897267\],
-html[data-theme="dark"] .text-zinc-400 {
+html[data-theme="dark"] .text-gray-600 {
+  --dm-20:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-\[\#5f5e5e\] {
+  --dm-21:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-500 {
+  --dm-22:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-gray-500 {
+  --dm-23:1;
   color: #a99d97 !important;
 }
 
-/* Marketing/auth pages (welcome, login) are always light-themed by design
-   and should not respond to the user's OS/app dark-mode preference. The
-   global dark-theme overrides above match by class name alone, so they
-   would otherwise wash out this page's text. These counter-rules restore
-   the original light-theme colors whenever .welcome-page-light is present,
-   regardless of html[data-theme]. */
-html[data-theme="dark"] .welcome-page-light .text-\[\#1a1c1c\],
-html[data-theme="dark"] .welcome-page-light .text-black,
-html[data-theme="dark"] .welcome-page-light .text-gray-900,
-html[data-theme="dark"] .welcome-page-light .text-zinc-900 {
-  color: #1a1c1c !important;
-  --welcome-light-scope: 1;
+html[data-theme="dark"] .text-gray-400 {
+  --dm-24:1;
+  color: #a99d97 !important;
 }
 
-html[data-theme="dark"] .welcome-page-light .text-\[\#5f5e5e\],
-html[data-theme="dark"] .welcome-page-light .text-gray-700,
-html[data-theme="dark"] .welcome-page-light .text-gray-600,
-html[data-theme="dark"] .welcome-page-light .text-zinc-500 {
-  color: #5f5e5e !important;
-  --welcome-light-scope: 1;
+html[data-theme="dark"] .text-\[\#897267\] {
+  --dm-25:1;
+  color: #a99d97 !important;
 }
 
-html[data-theme="dark"] .welcome-page-light .text-\[\#897267\],
-html[data-theme="dark"] .welcome-page-light .text-gray-500,
-html[data-theme="dark"] .welcome-page-light .text-gray-400,
-html[data-theme="dark"] .welcome-page-light .text-zinc-400 {
-  color: #897267 !important;
-  --welcome-light-scope: 1;
+html[data-theme="dark"] .text-zinc-400 {
+  --dm-26:1;
+  color: #a99d97 !important;
 }
 
-html[data-theme="dark"] .welcome-page-light .bg-white,
-html[data-theme="dark"] .welcome-page-light .bg-white\/90,
-html[data-theme="dark"] .welcome-page-light .bg-white\/94,
-html[data-theme="dark"] .welcome-page-light .bg-white\/72 {
-  background-color: initial !important;
-  color: inherit !important;
-  border-color: inherit !important;
-}
-
-html[data-theme="dark"] .border-gray-100,
-html[data-theme="dark"] .border-gray-200,
-html[data-theme="dark"] .border-\[\#ececec\],
-html[data-theme="dark"] .border-\[\#f1f1f1\] {
+html[data-theme="dark"] .border-gray-100 {
+  --dm-27:1;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-html[data-theme="dark"] input,
-html[data-theme="dark"] textarea,
-html[data-theme="dark"] select {
+html[data-theme="dark"] .border-gray-200 {
+  --dm-28:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .border-\[\#ececec\] {
+  --dm-29:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .border-\[\#f1f1f1\] {
+  --dm-30:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] input {
+  --dm-31:1;
   color: #f7f2ef !important;
   background:
     linear-gradient(180deg, rgba(37, 39, 39, 0.98), rgba(26, 28, 28, 0.96)) !important;
@@ -568,35 +639,82 @@ html[data-theme="dark"] select {
     0 10px 26px rgba(0, 0, 0, 0.2) !important;
 }
 
-html[data-theme="dark"] .welcome-page-light input,
-html[data-theme="dark"] .welcome-page-light textarea,
-html[data-theme="dark"] .welcome-page-light select {
-  color: #1a1c1c !important;
-  background: #fffaf6 !important;
-  border-color: #ded6d0 !important;
-  box-shadow: none !important;
+html[data-theme="dark"] textarea {
+  --dm-32:1;
+  color: #f7f2ef !important;
+  background:
+    linear-gradient(180deg, rgba(37, 39, 39, 0.98), rgba(26, 28, 28, 0.96)) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 26px rgba(0, 0, 0, 0.2) !important;
 }
 
-html[data-theme="dark"] .welcome-page-light input::placeholder,
-html[data-theme="dark"] .welcome-page-light textarea::placeholder {
-  color: #9a8276 !important;
+html[data-theme="dark"] select {
+  --dm-33:1;
+  color: #f7f2ef !important;
+  background:
+    linear-gradient(180deg, rgba(37, 39, 39, 0.98), rgba(26, 28, 28, 0.96)) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 26px rgba(0, 0, 0, 0.2) !important;
 }
 
-html[data-theme="dark"] input::placeholder,
-html[data-theme="dark"] textarea::placeholder {
+html[data-theme="dark"] input::placeholder {
+  --dm-34:1;
   color: #a99d97 !important;
 }
 
-html[data-theme="dark"] form label,
-html[data-theme="dark"] .form-label {
+html[data-theme="dark"] textarea::placeholder {
+  --dm-35:1;
+  color: #a99d97 !important;
+}
+
+html[data-theme="dark"] form label {
+  --dm-36:1;
   color: #f7f2ef;
 }
 
-html[data-theme="dark"] form input[type="number"],
-html[data-theme="dark"] form input[type="date"],
-html[data-theme="dark"] form input[type="datetime-local"],
-html[data-theme="dark"] form input[type="month"],
+html[data-theme="dark"] .form-label {
+  --dm-37:1;
+  color: #f7f2ef;
+}
+
+html[data-theme="dark"] form input[type="number"] {
+  --dm-38:1;
+  background:
+    linear-gradient(135deg, rgba(240,129,61, 0.12), rgba(26, 28, 28, 0.98)),
+    #1f2121 !important;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] form input[type="date"] {
+  --dm-39:1;
+  background:
+    linear-gradient(135deg, rgba(240,129,61, 0.12), rgba(26, 28, 28, 0.98)),
+    #1f2121 !important;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] form input[type="datetime-local"] {
+  --dm-40:1;
+  background:
+    linear-gradient(135deg, rgba(240,129,61, 0.12), rgba(26, 28, 28, 0.98)),
+    #1f2121 !important;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] form input[type="month"] {
+  --dm-41:1;
+  background:
+    linear-gradient(135deg, rgba(240,129,61, 0.12), rgba(26, 28, 28, 0.98)),
+    #1f2121 !important;
+  color: #f7f2ef !important;
+}
+
 html[data-theme="dark"] form input[type="time"] {
+  --dm-42:1;
   background:
     linear-gradient(135deg, rgba(240,129,61, 0.12), rgba(26, 28, 28, 0.98)),
     #1f2121 !important;
@@ -604,6 +722,7 @@ html[data-theme="dark"] form input[type="time"] {
 }
 
 html[data-theme="dark"] select {
+  --dm-43:1;
   background-image:
     linear-gradient(45deg, transparent 50%, #f7f2ef 50%),
     linear-gradient(135deg, #f7f2ef 50%, transparent 50%),
@@ -611,7 +730,452 @@ html[data-theme="dark"] select {
 }
 
 html[data-theme="dark"] .mobile-view-container {
+  --dm-44:1;
   background-color: var(--background);
+}
+
+/* ── Page-background gradient stops used by member pages
+   (health-tracker, knowledge, leaderboard, shop) that are
+   light-by-default at the markup level, e.g.
+   bg-gradient-to-b from-gray-50 to-gray-100 ── */
+html[data-theme="dark"] .from-gray-50 {
+  --dm-123:1;
+  --tw-gradient-from: #181a1a var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-slate-50 {
+  --dm-124:1;
+  --tw-gradient-from: #181a1a var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-100 {
+  --dm-125:1;
+  --tw-gradient-to: #1f2121 var(--tw-gradient-to-position) !important;
+}
+
+/* ── App header's neo-brutalist black border + spinner borders ── */
+html[data-theme="dark"] .border-black {
+  --dm-126:1;
+  border-color: #f7f2ef !important;
+}
+
+/* ============================================================
+   COMPREHENSIVE DARK THEME COVERAGE
+   ------------------------------------------------------------
+   The app is built almost entirely with arbitrary hex Tailwind
+   classes (e.g. bg-[#f7f3f0], text-[#5f5e5e]) rather than
+   semantic color tokens, so dark mode is implemented here as an
+   exhaustive class-matching override layer instead of editing
+   every component. Each block below groups colors by their
+   visual role (light page/card backgrounds, primary text,
+   secondary text, tertiary text, borders) so new colors can be
+   slotted into the right group instead of needing a brand new
+   rule. Brand orange accents and intentionally-dark surfaces
+   (e.g. bg-[#1a1c1c] full-page dark sections that already ship
+   with white text) are deliberately left untouched.
+   ============================================================ */
+
+/* ── Light/cream page & card backgrounds → dark surface ── */
+html[data-theme="dark"] .bg-\[\#f9f9f9\] {
+  --dm-45:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#faf8f6\] {
+  --dm-46:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fafafa\] {
+  --dm-47:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fbfbfb\] {
+  --dm-48:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f7f3f0\] {
+  --dm-49:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f7f4f2\] {
+  --dm-50:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f6f3f1\] {
+  --dm-51:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f5f2ef\] {
+  --dm-52:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f3efec\] {
+  --dm-53:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f1efed\] {
+  --dm-54:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#ece7e2\] {
+  --dm-55:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#ece7e3\] {
+  --dm-56:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#ebe5e1\] {
+  --dm-57:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#e8e1db\] {
+  --dm-58:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#ececec\] {
+  --dm-59:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f3f4f6\] {
+  --dm-60:1;
+  background-color: #1f2121 !important;
+}
+
+html[data-theme="dark"] .bg-\[\#d9d9d9\] {
+  --dm-61:1;
+  background-color: #1f2121 !important;
+}
+
+/* ── Light tinted accent backgrounds (cards, chips) → dark tinted surface ── */
+html[data-theme="dark"] .bg-\[\#fff2df\] {
+  --dm-62:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fff4e9\] {
+  --dm-63:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fff7ef\] {
+  --dm-64:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fff8f0\] {
+  --dm-65:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fffaf6\] {
+  --dm-66:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#ffe9e4\] {
+  --dm-67:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#f6d0b8\] {
+  --dm-68:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#eaf8e6\] {
+  --dm-69:1;
+  background-color: rgba(146, 200, 62, 0.14) !important;
+}
+
+/* ── Dark literal hex backgrounds used as small badges/pills on light
+   surfaces (NOT full-page dark sections) → keep dark but slightly lift
+   so they remain visible against the now-dark page background ── */
+html[data-theme="dark"] .bg-\[\#2d2926\] {
+  --dm-70:1;
+  background-color: #353130 !important;
+}
+
+/* ── Near-black primary text → light text ── */
+html[data-theme="dark"] .text-\[\#1f1f1f\] {
+  --dm-71:1;
+  color: #f7f2ef !important;
+}
+
+html[data-theme="dark"] .text-\[\#3a2b21\] {
+  --dm-72:1;
+  color: #f7f2ef !important;
+}
+
+/* ── Mid-gray secondary/tertiary text → lighter warm gray ── */
+html[data-theme="dark"] .text-\[\#5f5f5f\] {
+  --dm-73:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#6e625c\] {
+  --dm-74:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#7b746f\] {
+  --dm-75:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#7b7b7b\] {
+  --dm-76:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#8b7a6c\] {
+  --dm-77:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#8b8b8b\] {
+  --dm-78:1;
+  color: #c9beb8 !important;
+}
+
+html[data-theme="dark"] .text-\[\#846b58\] {
+  --dm-79:1;
+  color: #c9beb8 !important;
+}
+
+/* ── Borders on light cream cards → soft white border ── */
+html[data-theme="dark"] .border-\[\#ded6d0\] {
+  --dm-80:1;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .border-\[\#e5e5e5\] {
+  --dm-81:1;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .border-\[\#e8ddd6\] {
+  --dm-82:1;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .border-\[\#f0dfcf\] {
+  --dm-83:1;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .border-\[\#f0ebe6\] {
+  --dm-84:1;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ── Standard Tailwind grayscale text classes not already covered ── */
+html[data-theme="dark"] .text-gray-300 {
+  --dm-85:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-gray-800 {
+  --dm-86:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-gray-950 {
+  --dm-87:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-200 {
+  --dm-88:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-300 {
+  --dm-89:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-600 {
+  --dm-90:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-650 {
+  --dm-91:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-slate-600 {
+  --dm-92:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-slate-700 {
+  --dm-93:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-slate-800 {
+  --dm-94:1;
+  color: #d7ccc7 !important;
+}
+
+html[data-theme="dark"] .text-zinc-700 {
+  --dm-95:1;
+  color: #c9beb8 !important;
+}
+
+/* ── Standard Tailwind grayscale/slate backgrounds → dark surfaces ── */
+html[data-theme="dark"] .bg-gray-200 {
+  --dm-96:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-gray-300 {
+  --dm-97:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-slate-50 {
+  --dm-98:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-slate-100 {
+  --dm-99:1;
+  background-color: #252727 !important;
+}
+
+html[data-theme="dark"] .bg-slate-300 {
+  --dm-100:1;
+  background-color: #252727 !important;
+}
+
+/* ── Standard Tailwind grayscale/slate borders ── */
+html[data-theme="dark"] .border-gray-300 {
+  --dm-101:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .border-gray-50 {
+  --dm-102:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .border-gray-200\/60 {
+  --dm-103:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .border-slate-300 {
+  --dm-104:1;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ── bg-white opacity variants used as glass/frosted panels on light
+   surfaces → matching frosted treatment on dark surfaces ── */
+html[data-theme="dark"] .bg-white\/70 {
+  --dm-105:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/72 {
+  --dm-106:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/75 {
+  --dm-107:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/80 {
+  --dm-108:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/85 {
+  --dm-109:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/90 {
+  --dm-110:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/94 {
+  --dm-111:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/95 {
+  --dm-112:1;
+  background-color: rgba(31, 33, 33, 0.9) !important;
+}
+
+html[data-theme="dark"] .bg-white\/5 {
+  --dm-113:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/8 {
+  --dm-114:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/10 {
+  --dm-115:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/14 {
+  --dm-116:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/15 {
+  --dm-117:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/20 {
+  --dm-118:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/25 {
+  --dm-119:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/30 {
+  --dm-120:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-white\/45 {
+  --dm-121:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .bg-gray-50\/50 {
+  --dm-122:1;
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 /* Approved icon badge treatment: black shell with white inner icon/mark. */
@@ -1076,19 +1640,19 @@ form :is(input, textarea, select):disabled {
 }
 
 /* Shared member UI based on the Rank page. */
-.member-rank-theme {
+html:not([data-theme="dark"]) .member-rank-theme {
   background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%) !important;
   color: #1a1c1c !important;
 }
 
-.member-rank-theme .app-content-scroll,
-.member-rank-theme .app-content-scroll > div,
-.member-rank-theme .health-tracker-theme {
+html:not([data-theme="dark"]) .member-rank-theme .app-content-scroll,
+html:not([data-theme="dark"]) .member-rank-theme .app-content-scroll > div,
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-theme {
   background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%) !important;
   color: #1a1c1c !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .bg-\[\#1a1c1c\],
   .bg-\[\#111313\],
   .bg-\[\#2d2926\],
@@ -1103,7 +1667,7 @@ form :is(input, textarea, select):disabled {
   background-color: #ffffff !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .bg-white\/3,
   .bg-white\/5,
   .bg-white\/10,
@@ -1114,7 +1678,7 @@ form :is(input, textarea, select):disabled {
   background-color: #f9fafb !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .from-zinc-900,
   .from-zinc-950\/80,
   .from-\[\#1a1c1c\],
@@ -1123,15 +1687,15 @@ form :is(input, textarea, select):disabled {
   --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
 }
 
-.member-rank-theme :is(.via-zinc-800, .via-black\/35) {
+html:not([data-theme="dark"]) .member-rank-theme :is(.via-zinc-800, .via-black\/35) {
   --tw-gradient-via: #f9fafb var(--tw-gradient-via-position) !important;
 }
 
-.member-rank-theme :is(.to-black, .to-zinc-900, .to-\[\#1a1c1c\]) {
+html:not([data-theme="dark"]) .member-rank-theme :is(.to-black, .to-zinc-900, .to-\[\#1a1c1c\]) {
   --tw-gradient-to: #f3f4f6 var(--tw-gradient-to-position) !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .text-white,
   .text-white\/90,
   .text-white\/80,
@@ -1157,7 +1721,7 @@ form :is(input, textarea, select):disabled {
   color: #1a1c1c !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .text-\[\#f0813d\],
   .text-\[\#9c4400\],
   .text-orange-400,
@@ -1169,7 +1733,7 @@ form :is(input, textarea, select):disabled {
   color: #f0813d !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .border-white\/5,
   .border-white\/6,
   .border-white\/8,
@@ -1181,26 +1745,26 @@ form :is(input, textarea, select):disabled {
   border-color: #e5e7eb !important;
 }
 
-.member-rank-theme :is(input, textarea, select) {
+html:not([data-theme="dark"]) .member-rank-theme :is(input, textarea, select) {
   background: #ffffff !important;
   border-color: #e5e7eb !important;
   color: #1a1c1c !important;
   box-shadow: none !important;
 }
 
-.member-rank-theme :is(input, textarea)::placeholder {
+html:not([data-theme="dark"]) .member-rank-theme :is(input, textarea)::placeholder {
   color: #6b7280 !important;
   opacity: 1;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .bg-\[\#f0813d\],
   .bg-\[\#9c4400\]
 ) {
   color: #ffffff !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .bg-\[\#f0813d\],
   .bg-\[\#9c4400\]
 ) :is(
@@ -1213,37 +1777,37 @@ form :is(input, textarea, select):disabled {
   stroke: currentColor;
 }
 
-.member-rank-theme .member-gym-banner > p {
+html:not([data-theme="dark"]) .member-rank-theme .member-gym-banner > p {
   color: #000000 !important;
 }
 
-.member-rank-theme .member-gym-banner > span {
+html:not([data-theme="dark"]) .member-rank-theme .member-gym-banner > span {
   color: #ffffff !important;
 }
 
-.member-rank-theme .member-quick-action {
+html:not([data-theme="dark"]) .member-rank-theme .member-quick-action {
   background: #f0813d !important;
   border-color: #fdba74 !important;
 }
 
-.member-rank-theme .member-quick-action > span:first-child {
+html:not([data-theme="dark"]) .member-rank-theme .member-quick-action > span:first-child {
   background: #000000 !important;
   color: #ffffff !important;
 }
 
-.member-rank-theme .member-quick-action > span:last-child > span:first-child {
+html:not([data-theme="dark"]) .member-rank-theme .member-quick-action > span:last-child > span:first-child {
   color: #000000 !important;
 }
 
-.member-rank-theme .member-quick-action > span:last-child > span:last-child {
+html:not([data-theme="dark"]) .member-rank-theme .member-quick-action > span:last-child > span:last-child {
   color: #ffffff !important;
 }
 
-.member-rank-theme .manage-subscription-button {
+html:not([data-theme="dark"]) .member-rank-theme .manage-subscription-button {
   color: #000000 !important;
 }
 
-.member-rank-theme .subscription-card :is(
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card :is(
   h1,
   h2,
   h3,
@@ -1264,14 +1828,14 @@ form :is(input, textarea, select):disabled {
   text-shadow: none !important;
 }
 
-.member-rank-theme .subscription-card :is(
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card :is(
   .text-\[\#f0813d\],
   .text-\[\#9c4400\]
 ) {
   color: #f0813d !important;
 }
 
-.member-rank-theme .subscription-card :is(
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card :is(
   .subscription-plan-label,
   .subscription-time-left,
   .subscription-time-left span
@@ -1280,12 +1844,12 @@ form :is(input, textarea, select):disabled {
 }
 
 /* Health Tracker follows the Rank page light theme. */
-.member-rank-theme .health-tracker-light {
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light {
   background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%) !important;
   color: #1a1c1c !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .bg-blue-600,
   .bg-green-600,
   .bg-green-500,
@@ -1294,7 +1858,7 @@ form :is(input, textarea, select):disabled {
   background-color: #f0813d !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .text-blue-600,
   .text-blue-500,
   .text-green-600,
@@ -1306,21 +1870,21 @@ form :is(input, textarea, select):disabled {
   color: #f0813d !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .border-blue-600,
   .border-green-600
 ) {
   border-color: #f0813d !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .bg-white,
   [class*="bg-white"]
 ) {
   background-color: #ffffff !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .text-white,
   .text-gray-800,
   .text-gray-700,
@@ -1331,12 +1895,12 @@ form :is(input, textarea, select):disabled {
   color: #1a1c1c !important;
 }
 
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .bg-\[\#f0813d\],
   .bg-blue-600,
   .bg-green-600
 ) :is(.text-white, svg),
-.member-rank-theme .health-tracker-light :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light :is(
   .bg-\[\#f0813d\].text-white,
   .bg-blue-600.text-white,
   .bg-green-600.text-white
@@ -1344,12 +1908,12 @@ form :is(input, textarea, select):disabled {
   color: #ffffff !important;
 }
 
-.member-rank-theme .health-tracker-light .ai-health-coach-card {
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light .ai-health-coach-card {
   background: #000000 !important;
   color: #ffffff !important;
 }
 
-.member-rank-theme .health-tracker-light .ai-health-coach-card :is(
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light .ai-health-coach-card :is(
   h3,
   p,
   span,
@@ -1360,20 +1924,20 @@ form :is(input, textarea, select):disabled {
   -webkit-text-fill-color: #ffffff !important;
 }
 
-.member-rank-theme .health-tracker-light .ai-health-coach-card .ai-advice-button {
+html:not([data-theme="dark"]) .member-rank-theme .health-tracker-light .ai-health-coach-card .ai-advice-button {
   background: #000000 !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
-.member-rank-theme .workout-today-label {
+html:not([data-theme="dark"]) .member-rank-theme .workout-today-label {
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
   text-shadow: none !important;
 }
 
-.member-rank-theme :is(
+html:not([data-theme="dark"]) .member-rank-theme :is(
   .shadow-sm,
   .shadow-md,
   .shadow-lg,
@@ -1383,7 +1947,7 @@ form :is(input, textarea, select):disabled {
 }
 
 /* Preserve contrast on photographic and intentionally dark hero cards. */
-.member-rank-theme .relative.overflow-hidden:not(.subscription-card) .absolute.bg-cover ~ .relative :is(
+html:not([data-theme="dark"]) .member-rank-theme .relative.overflow-hidden:not(.subscription-card) .absolute.bg-cover ~ .relative :is(
   h1,
   h2,
   h3,
@@ -1399,7 +1963,7 @@ form :is(input, textarea, select):disabled {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
 }
 
-.member-rank-theme .relative.overflow-hidden:not(.subscription-card) .absolute.bg-cover ~ .relative :is(
+html:not([data-theme="dark"]) .member-rank-theme .relative.overflow-hidden:not(.subscription-card) .absolute.bg-cover ~ .relative :is(
   .text-\[\#f0813d\],
   .text-\[\#9c4400\]
 ) {
@@ -1407,7 +1971,7 @@ form :is(input, textarea, select):disabled {
 }
 
 /* Subscription card uses black typography even though it contains a photo layer. */
-.member-rank-theme .subscription-card .relative :is(
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card .relative :is(
   h1,
   h2,
   h3,
@@ -1423,18 +1987,18 @@ form :is(input, textarea, select):disabled {
   text-shadow: none !important;
 }
 
-.member-rank-theme .subscription-card .relative :is(
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card .relative :is(
   .text-\[\#f0813d\],
   .text-\[\#9c4400\]
 ) {
   color: #f0813d !important;
 }
 
-.member-rank-theme .subscription-card.relative.overflow-hidden
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card.relative.overflow-hidden
   .absolute.bg-cover
   ~ .relative
   .subscription-time-left,
-.member-rank-theme .subscription-card.relative.overflow-hidden
+html:not([data-theme="dark"]) .member-rank-theme .subscription-card.relative.overflow-hidden
   .absolute.bg-cover
   ~ .relative
   .subscription-time-left
@@ -1764,12 +2328,12 @@ form :is(input, textarea, select):disabled {
 }
 
 /* Balanced trainer workspace: dark command areas + crisp white work cards. */
-.trainer-balanced-theme {
+html:not([data-theme="dark"]) .trainer-balanced-theme {
   background: #ece7e3;
   color: #1a1c1c;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-gray-50,
   .bg-gray-100,
   .bg-\[\#fafafa\],
@@ -1778,7 +2342,7 @@ form :is(input, textarea, select):disabled {
   background-color: #f3efec !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-white,
   .bg-white\/90,
   .bg-white\/75
@@ -1786,7 +2350,7 @@ form :is(input, textarea, select):disabled {
   background-color: #ffffff !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-\[\#1a1c1c\],
   .bg-\[\#111313\],
   .bg-\[\#2d2926\],
@@ -1798,11 +2362,11 @@ form :is(input, textarea, select):disabled {
   color: #ffffff !important;
 }
 
-.trainer-balanced-theme .bg-\[\#2d2926\] {
+html:not([data-theme="dark"]) .trainer-balanced-theme .bg-\[\#2d2926\] {
   background-color: #2d2926 !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-\[\#1a1c1c\],
   .bg-\[\#111313\],
   .bg-\[\#2d2926\],
@@ -1837,7 +2401,7 @@ form :is(input, textarea, select):disabled {
   color: #ffffff !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-\[\#1a1c1c\],
   .bg-\[\#111313\],
   .bg-\[\#2d2926\],
@@ -1856,7 +2420,7 @@ form :is(input, textarea, select):disabled {
   color: #f0813d !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .border-white\/5,
   .border-white\/6,
   .border-white\/8,
@@ -1866,7 +2430,7 @@ form :is(input, textarea, select):disabled {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .border-gray-100,
   .border-gray-200,
   .border-\[\#ececec\],
@@ -1875,27 +2439,27 @@ form :is(input, textarea, select):disabled {
   border-color: #ded6d0 !important;
 }
 
-.trainer-balanced-theme input,
-.trainer-balanced-theme textarea,
-.trainer-balanced-theme select {
+html:not([data-theme="dark"]) .trainer-balanced-theme input,
+html:not([data-theme="dark"]) .trainer-balanced-theme textarea,
+html:not([data-theme="dark"]) .trainer-balanced-theme select {
   background: #ffffff !important;
   border-color: #ded6d0 !important;
   color: #1a1c1c !important;
 }
 
-.trainer-balanced-theme .app-header {
+html:not([data-theme="dark"]) .trainer-balanced-theme .app-header {
   background: #ffffff !important;
   color: #000000 !important;
   border-color: #000000 !important;
 }
 
-.trainer-balanced-theme .app-header .text-white,
-.trainer-balanced-theme .app-header svg {
+html:not([data-theme="dark"]) .trainer-balanced-theme .app-header .text-white,
+html:not([data-theme="dark"]) .trainer-balanced-theme .app-header svg {
   color: #000000 !important;
   stroke: #000000 !important;
 }
 
-.trainer-balanced-theme :is(
+html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   .bg-\[\#f0813d\].text-white,
   .from-\[\#f0813d\].text-white,
   .from-\[\#f0813d\] .text-white

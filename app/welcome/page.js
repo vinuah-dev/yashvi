@@ -16,11 +16,15 @@ import {
   BarChart3,
   Smartphone,
   Cloud,
+  Sun,
+  Moon,
 } from "lucide-react";
 import SSLogo from "@/components/shared/SSLogo";
+import { useTheme } from "@/components/shared/ThemeProvider";
 
 export default function WelcomePage() {
   const [currentFeature, setCurrentFeature] = useState(0);
+  const { theme, toggleTheme } = useTheme();
 
   const features = [
     {
@@ -60,7 +64,7 @@ export default function WelcomePage() {
   }, [features.length]);
 
   return (
-    <div className="welcome-page-light relative min-h-screen overflow-hidden bg-[#f7f3f0] text-[#1a1c1c]">
+    <div className="relative min-h-screen overflow-hidden bg-[#f7f3f0] text-[#1a1c1c]">
       <div className="absolute inset-0 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.42]"
@@ -81,12 +85,23 @@ export default function WelcomePage() {
       <main className="relative z-10">
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
           <SSLogo size="md" showWordmark={false} />
-          <Link
-            href="/auth/login"
-            className="rounded-full border border-[#ded6d0] bg-white/90 px-5 py-2 text-sm font-bold text-[#1a1c1c] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:border-[#f0813d] hover:text-[#9c4400]"
-          >
-            Login
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ded6d0] bg-white/90 text-[#1a1c1c] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:border-[#f0813d] hover:text-[#9c4400]"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <Link
+              href="/auth/login"
+              className="rounded-full border border-[#ded6d0] bg-white/90 px-5 py-2 text-sm font-bold text-[#1a1c1c] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:border-[#f0813d] hover:text-[#9c4400]"
+            >
+              Login
+            </Link>
+          </div>
         </nav>
 
         <section className="mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-16 pt-6 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:pb-20">
