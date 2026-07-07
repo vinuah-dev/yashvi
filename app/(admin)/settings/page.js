@@ -221,7 +221,7 @@ export default function SettingsPage() {
       <Header title="Settings" showBack={false} />
 
       <main className="px-3 py-3 space-y-4">
-        <section className="relative mx-1 overflow-hidden rounded-2xl border border-[#9c4400]/20 bg-gradient-to-br from-[#f0813d] via-[#d76621] to-[#9c4400] p-5 shadow-xl shadow-orange-200/60">
+        {/* <section className="relative mx-1 overflow-hidden rounded-2xl border border-[#9c4400]/20 bg-gradient-to-br from-[#f0813d] via-[#d76621] to-[#9c4400] p-5 shadow-xl shadow-orange-200/60"> */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.28),transparent_32%),linear-gradient(135deg,rgba(255,255,255,0.14),transparent_45%)]" />
           <div className="relative flex items-center justify-between gap-3">
             <div>
