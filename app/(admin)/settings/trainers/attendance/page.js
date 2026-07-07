@@ -491,20 +491,22 @@ export default function TrainerAttendanceQuickPage() {
                     ) : (
                       <div className="space-y-2 max-h-112 overflow-y-auto pr-1">
                         {visibleDays.map((day) => (
-                          <div key={day.attendance_date} className="rounded-xl border border-gray-100 px-3 py-3 sm:px-4 space-y-3">
-                            <div className="flex items-start justify-between gap-3 flex-wrap">
+                          <div key={day.attendance_date} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                            {/* Day Header */}
+                            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
                               <div>
-                                <p className="font-medium text-gray-900">
-                                  {new Date(`${day.attendance_date}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                                <p className="font-bold text-gray-900">
+                                  {new Date(`${day.attendance_date}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                                 </p>
-                                <p className="text-xs text-gray-500">{day.weekday_name}</p>
+                                <p className="text-xs text-gray-500 font-medium">{day.weekday_name}</p>
                               </div>
-                              <div className="flex gap-2 flex-wrap text-xs">
-                                <span className="rounded-full bg-gray-100 px-2.5 py-1 text-gray-700">Expected {formatHoursLabel(day.expected_minutes)}</span>
-                                <span className="rounded-full bg-[#f0813d]/10 px-2.5 py-1 text-[#9c4400]">Worked {formatHoursLabel(day.worked_minutes)}</span>
-                                <span className="rounded-full bg-[#f0813d]/10 px-2.5 py-1 text-[#9c4400]">Salary ₹{Number(day.daily_salary || 0).toLocaleString("en-IN")}</span>
+                              <div className="flex flex-col items-end gap-1 text-xs">
+                                <span className="text-gray-500">Expected: <span className="font-semibold text-gray-700">{formatHoursLabel(day.expected_minutes)}</span></span>
+                                <span className="text-[#9c4400] font-semibold">Worked: {formatHoursLabel(day.worked_minutes)}</span>
+                                <span className="font-bold text-[#9c4400]">₹{Number(day.daily_salary || 0).toLocaleString("en-IN")}</span>
                               </div>
                             </div>
+                            <div className="px-4 py-3 space-y-3">
 
                             {(day.expected_slots || []).length > 0 && (
                               <div className="flex flex-wrap gap-2">
@@ -516,7 +518,7 @@ export default function TrainerAttendanceQuickPage() {
                               </div>
                             )}
 
-                            <div className="grid gap-3 lg:grid-cols-2">
+                            <div className="grid gap-3 grid-cols-2">
                               {TRAINER_ATTENDANCE_SESSIONS.map((session) => {
                                 const draft = attendanceDrafts[day.attendance_date]?.[session.sessionNumber] || {
                                   checkInParts: createEmptyTimeParts(),
@@ -524,12 +526,17 @@ export default function TrainerAttendanceQuickPage() {
                                 };
                                 const existingSession = (day.sessions || []).find((item) => item.session_number === session.sessionNumber);
                                 return (
-                                  <div key={session.sessionNumber} className="rounded-xl border border-gray-200 bg-gray-50 p-3 sm:p-4 space-y-3">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <p className="text-sm font-semibold text-gray-900">{session.label}</p>
-                                      <span className="text-xs text-gray-500">{existingSession?.worked_minutes ? formatHoursLabel(existingSession.worked_minutes) : "0 hrs"}</span>
+                                  <div key={session.sessionNumber} className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+                                    <div className="flex items-center justify-between gap-2 mb-3">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-[#f0813d]" />
+                                        <p className="text-sm font-bold text-gray-900">{session.label}</p>
+                                      </div>
+                                      <span className="text-xs font-semibold text-[#9c4400] bg-[#f0813d]/10 px-2 py-0.5 rounded-full">
+                                        {existingSession?.worked_minutes ? formatHoursLabel(existingSession.worked_minutes) : "0 hrs"}
+                                      </span>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div className="grid grid-cols-2 gap-3">
                                       <AttendanceTimePicker
                                         label="Check In"
                                         parts={draft.checkInParts}
@@ -550,12 +557,12 @@ export default function TrainerAttendanceQuickPage() {
                               })}
                             </div>
 
-                            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-2 pt-1">
                               <button
                                 type="button"
                                 onClick={() => resetAttendanceDay(day)}
                                 disabled={attendanceSaving}
-                                className="w-full sm:w-auto px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                                className="px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-colors"
                               >
                                 Reset
                               </button>
@@ -563,13 +570,14 @@ export default function TrainerAttendanceQuickPage() {
                                 type="button"
                                 onClick={() => saveAttendanceDay(day)}
                                 disabled={attendanceSaving}
-                                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-[#9c4400] px-3 py-2 text-xs font-medium text-white hover:bg-[#9c4400] disabled:opacity-60"
+                                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#f0813d] to-[#9c4400] px-4 py-2 text-xs font-bold text-white hover:shadow-md disabled:opacity-60 transition-all active:scale-95"
                               >
                                 <Save className="w-3.5 h-3.5" />
                                 Save Day
                               </button>
                             </div>
-                          </div>
+                            </div>{/* end inner div */}
+                          </div>{/* end day card */}
                         ))}
                       </div>
                     )}

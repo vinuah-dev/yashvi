@@ -516,6 +516,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
             exercise_name,
             sets,
             reps,
+            timing_minutes,
             weight,
             rest_seconds,
             notes,
@@ -652,6 +653,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                 exercise_name: ex.exercise_name,
                 sets: ex.sets || null,
                 reps: ex.reps || null,
+                timing_minutes: ex.timing_minutes ? Number(ex.timing_minutes) : null,
                 weight: ex.weight || null,
                 rest_seconds: ex.rest_seconds || null,
                 notes: ex.notes || null,
@@ -688,6 +690,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
           exercise_name: "",
           sets: "",
           reps: "",
+          timing_minutes: "",
           weight: "",
           rest_seconds: "",
           notes: "",
@@ -878,71 +881,89 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                       {day.exercises && day.exercises.length > 0 && (
                         <div className="space-y-2">
                           {day.exercises.map((exercise, exerciseIndex) => (
-                            <div key={exerciseIndex} className="bg-gray-50 rounded-lg p-2">
-                              <div className="grid grid-cols-6 gap-1 items-center">
-                                <div className="col-span-3">
-                                  <input
-                                    type="text"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                    placeholder="Exercise name"
-                                    value={exercise.exercise_name}
-                                    onChange={(e) => updateExercise(dayNum, exerciseIndex, "exercise_name", e.target.value)}
-                                  />
-                                </div>
+                            <div key={exerciseIndex} className="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+                              {/* Row 1: Exercise name + delete */}
+                              <div className="flex items-center gap-2 mb-2">
+                                <input
+                                  type="text"
+                                  className="flex-1 px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all font-medium"
+                                  placeholder="Exercise name"
+                                  value={exercise.exercise_name}
+                                  onChange={(e) => updateExercise(dayNum, exerciseIndex, "exercise_name", e.target.value)}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeExercise(dayNum, exerciseIndex)}
+                                  className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg active:scale-95 transition-all shrink-0"
+                                  style={{ minHeight: '32px', minWidth: '32px' }}
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </div>
+                              {/* Row 2: Sets / Reps / Timing */}
+                              <div className="grid grid-cols-3 gap-1.5 mb-1.5">
                                 <div>
+                                  <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Sets</label>
                                   <input
                                     type="number"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                    placeholder="Sets"
+                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
+                                    placeholder="—"
                                     value={exercise.sets}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "sets", e.target.value)}
                                   />
                                 </div>
                                 <div>
+                                  <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Reps</label>
                                   <input
                                     type="text"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                    placeholder="Reps"
+                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
+                                    placeholder="—"
                                     value={exercise.reps}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "reps", e.target.value)}
                                   />
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Time (min)</label>
+                                  <input
+                                    type="number"
+                                    className="w-full px-2 py-1.5 border border-[#f0813d]/30 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center bg-[#fff8f4]"
+                                    placeholder="—"
+                                    value={exercise.timing_minutes || ""}
+                                    onChange={(e) => updateExercise(dayNum, exerciseIndex, "timing_minutes", e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                              {/* Row 3: Weight / Rest */}
+                              <div className="grid grid-cols-2 gap-1.5 mb-1.5">
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Weight</label>
                                   <input
                                     type="text"
                                     className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                    placeholder="Weight"
+                                    placeholder="e.g. 20kg"
                                     value={exercise.weight}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "weight", e.target.value)}
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => removeExercise(dayNum, exerciseIndex)}
-                                    className="p-1 text-[#f0813d] hover:bg-[#f0813d]/10 rounded-lg active:scale-95 transition-all"
-                                    style={{ minHeight: '32px', minWidth: '32px' }}
-                                  >
-                                    <XCircle className="w-4 h-4" />
-                                  </button>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Rest (sec)</label>
+                                  <input
+                                    type="number"
+                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
+                                    placeholder="60"
+                                    value={exercise.rest_seconds}
+                                    onChange={(e) => updateExercise(dayNum, exerciseIndex, "rest_seconds", e.target.value)}
+                                  />
                                 </div>
                               </div>
-                              <div className="mt-1">
-                                <input
-                                  type="text"
-                                  className="w-full px-2 py-1 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                  placeholder="Notes (optional)"
-                                  value={exercise.notes || ""}
-                                  onChange={(e) => updateExercise(dayNum, exerciseIndex, "notes", e.target.value)}
-                                />
-                              </div>
-                              <div className="mt-1">
-                                <input
-                                  type="number"
-                                  className="w-full px-2 py-1 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
-                                  placeholder="Rest (seconds)"
-                                  value={exercise.rest_seconds}
-                                  onChange={(e) => updateExercise(dayNum, exerciseIndex, "rest_seconds", e.target.value)}
-                                />
-                              </div>
+                              {/* Notes */}
+                              <input
+                                type="text"
+                                className="w-full px-2 py-1.5 border border-gray-100 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all bg-gray-50 text-gray-600"
+                                placeholder="Notes (optional)"
+                                value={exercise.notes || ""}
+                                onChange={(e) => updateExercise(dayNum, exerciseIndex, "notes", e.target.value)}
+                              />
                             </div>
                           ))}
                         </div>

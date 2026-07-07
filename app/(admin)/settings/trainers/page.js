@@ -617,29 +617,73 @@ export default function TrainersPage() {
                       <td colSpan={5} className="px-4 py-8 text-center text-gray-500">No payroll data for this month.</td>
                     </tr>
                   ) : (
-                    payrollData.trainers.map((row) => (
-                      <tr key={row.gym_trainer_id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => router.push(`/settings/trainers/${row.gym_trainer_id}?tab=attendance`)}
-                            className="text-left"
-                          >
-                            <p className="font-medium text-gray-900">{row.trainer_name}</p>
-                            <p className="text-xs text-gray-500">
-                              Salary ₹{Number(row.monthly_salary || 0).toLocaleString("en-IN")}
-                              {row.specialization ? ` • ${row.specialization}` : ""}
+                    payrollData.trainers.map((row) => {
+                      const hasNoMembers = !row.assigned_members_count || Number(row.assigned_members_count) === 0;
+                      const salaryEarned = Number(row.salary_earned || 0);
+                      const ptCharges = Number(row.pt_charges || 0);
+                      const totalPayable = Number(row.total_payable || 0);
+                      // pt_sessions: array of { member_name, amount } if provided by RPC
+                      const ptSessions = row.pt_sessions || [];
+
+                      return (
+                        <tr key={row.gym_trainer_id} className="hover:bg-gray-50 align-top">
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => router.push(`/settings/trainers/${row.gym_trainer_id}?tab=attendance`)}
+                              className="text-left"
+                            >
+                              <p className="font-medium text-gray-900">{row.trainer_name}</p>
+                              <p className="text-xs text-gray-500">
+                                Base ₹{Number(row.monthly_salary || 0).toLocaleString("en-IN")}/mo
+                                {row.specialization ? ` • ${row.specialization}` : ""}
+                              </p>
+                              {hasNoMembers && (
+                                <span className="inline-block mt-1 text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
+                                  No members assigned
+                                </span>
+                              )}
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            <p className="font-medium">{formatHoursLabel(Number(row.worked_hours || 0) * 60)}</p>
+                            <p className="text-xs text-gray-400">of {formatHoursLabel(Number(row.expected_hours || 0) * 60)} expected</p>
+                            <p className="text-xs text-gray-400">{Number(row.working_days || 0)} days</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className={`font-medium ${salaryEarned === 0 ? "text-gray-400" : "text-[#9c4400]"}`}>
+                              ₹{salaryEarned.toLocaleString("en-IN")}
                             </p>
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          <p>{formatHoursLabel(Number(row.worked_hours || 0) * 60)} / {formatHoursLabel(Number(row.expected_hours || 0) * 60)}</p>
-                          <p className="text-xs text-gray-500">{Number(row.working_days || 0).toLocaleString("en-IN")} working days</p>
-                        </td>
-                        <td className="px-4 py-3 font-medium text-[#9c4400]">₹{Number(row.salary_earned || 0).toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3 font-medium text-[#9c4400]">₹{Number(row.pt_charges || 0).toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3 font-semibold text-[#9c4400]">₹{Number(row.total_payable || 0).toLocaleString("en-IN")}</td>
-                      </tr>
-                    ))
+                            {salaryEarned === 0 && (
+                              <p className="text-[10px] text-gray-400">No hours logged</p>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {ptCharges > 0 ? (
+                              <div className="space-y-1">
+                                <p className="font-semibold text-[#9c4400]">₹{ptCharges.toLocaleString("en-IN")}</p>
+                                {/* Show per-student breakdown if available */}
+                                {ptSessions.length > 0 ? (
+                                  <div className="space-y-0.5">
+                                    {ptSessions.map((ps, i) => (
+                                      <p key={i} className="text-[10px] text-gray-500">
+                                        {ps.member_name}: ₹{Number(ps.amount || 0).toLocaleString("en-IN")}
+                                      </p>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
+                            ) : (
+                              <p className="text-gray-400 text-sm">₹0</p>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className={`font-bold text-base ${totalPayable === 0 ? "text-gray-400" : "text-[#9c4400]"}`}>
+                              ₹{totalPayable.toLocaleString("en-IN")}
+                            </p>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>

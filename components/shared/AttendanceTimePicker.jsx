@@ -13,51 +13,59 @@ export default function AttendanceTimePicker({
   onPartChange,
   onClear,
 }) {
+  const hasValue = parts?.hour || parts?.minute || parts?.meridiem;
+
   return (
-    <div className="min-w-0 rounded-xl border border-gray-200 bg-white p-2.5 sm:border-0 sm:bg-transparent sm:p-0 space-y-2">
+    <div className="min-w-0 space-y-1.5">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-gray-600">{label}</span>
-        <button
-          type="button"
-          onClick={onClear}
-          disabled={disabled}
-          className="text-[11px] font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
-        >
-          Clear
-        </button>
+        <span className="text-xs font-semibold text-gray-700">{label}</span>
+        {hasValue && (
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={disabled}
+            className="text-[10px] font-medium text-[#f0813d] hover:text-[#9c4400] disabled:opacity-40 transition-colors"
+          >
+            Clear
+          </button>
+        )}
       </div>
-      <div className="grid grid-cols-2 gap-2 min-w-0 sm:grid-cols-3">
+      <div className="flex items-center gap-1 bg-gray-50 rounded-xl border border-gray-200 px-2 py-1.5">
+        {/* Hour */}
         <select
           value={parts?.hour || ""}
           onChange={(e) => onPartChange("hour", e.target.value)}
           disabled={disabled}
-          className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-sm focus:ring-2 focus:ring-[#f0813d] focus:border-transparent"
+          className="flex-1 min-w-0 bg-transparent border-none text-sm font-semibold text-gray-800 focus:outline-none focus:ring-0 appearance-none text-center cursor-pointer disabled:opacity-50"
         >
-          <option value="">Hour</option>
+          <option value="">--</option>
           {ATTENDANCE_HOUR_OPTIONS.map((hour) => (
             <option key={hour} value={hour}>{hour}</option>
           ))}
         </select>
-
+        <span className="text-gray-400 font-bold text-sm select-none">:</span>
+        {/* Minute */}
         <select
           value={parts?.minute || ""}
           onChange={(e) => onPartChange("minute", e.target.value)}
           disabled={disabled}
-          className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-sm focus:ring-2 focus:ring-[#f0813d] focus:border-transparent"
+          className="flex-1 min-w-0 bg-transparent border-none text-sm font-semibold text-gray-800 focus:outline-none focus:ring-0 appearance-none text-center cursor-pointer disabled:opacity-50"
         >
-          <option value="">Min</option>
+          <option value="">--</option>
           {ATTENDANCE_MINUTE_OPTIONS.map((minute) => (
             <option key={minute} value={minute}>{minute}</option>
           ))}
         </select>
-
+        {/* Divider */}
+        <div className="w-px h-5 bg-gray-300 mx-0.5" />
+        {/* Meridiem */}
         <select
           value={parts?.meridiem || ""}
           onChange={(e) => onPartChange("meridiem", e.target.value)}
           disabled={disabled}
-          className="col-span-2 w-full min-w-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-sm focus:ring-2 focus:ring-[#f0813d] focus:border-transparent sm:col-span-1"
+          className="w-12 min-w-0 bg-transparent border-none text-xs font-bold text-[#9c4400] focus:outline-none focus:ring-0 appearance-none text-center cursor-pointer disabled:opacity-50"
         >
-          <option value="">AM/PM</option>
+          <option value="">AM</option>
           {ATTENDANCE_MERIDIEM_OPTIONS.map((meridiem) => (
             <option key={meridiem} value={meridiem}>{meridiem}</option>
           ))}

@@ -223,81 +223,34 @@ export default function SettingsPage() {
       <main className="px-3 py-3 space-y-4">
         <section className="relative mx-1 overflow-hidden rounded-2xl border border-[#9c4400]/20 bg-gradient-to-br from-[#f0813d] via-[#d76621] to-[#9c4400] p-5 shadow-xl shadow-orange-200/60">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.28),transparent_32%),linear-gradient(135deg,rgba(255,255,255,0.14),transparent_45%)]" />
-          <div className="relative">
-            <div className="mb-5 flex items-start justify-between gap-3">
-              <div>
-                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/20 px-3 py-1 text-xs font-bold text-white">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Advanced admin suite
-                </div>
-                <h1 className="max-w-[16rem] text-2xl font-black leading-tight text-white">
-                  Control every gym operation from one hub.
-                </h1>
-              </div>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-[#9c4400] shadow-lg">
-                <SettingsIcon className="h-6 w-6" />
+          <div className="relative flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-black leading-tight text-white truncate max-w-[220px]">
+                {gymName || "Your Gym"}
+              </h1>
+              <div className="mt-2 flex items-center gap-2 text-white/80">
+                <Users className="h-4 w-4" />
+                <p className="text-sm font-semibold">{loading ? "..." : totalMembers} Members</p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { label: "Tools", value: visibleSections.length, icon: Wrench },
-                { label: "Members", value: loading ? "..." : totalMembers, icon: Users },
-                { label: "Version", value: appStats.version, icon: Zap },
-              ].map((stat) => {
-                const Icon = stat.icon;
-                return (
-                  <div key={stat.label} className="rounded-xl border border-white/15 bg-white/10 p-3 backdrop-blur">
-                    <Icon className="mb-2 h-4 w-4 text-white/75" />
-                    <p className="truncate text-base font-black text-white">{stat.value}</p>
-                    <p className="text-[11px] font-semibold text-white/65">{stat.label}</p>
-                  </div>
-                );
-              })}
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 border border-white/20 backdrop-blur-sm">
+              <Building className="h-7 w-7 text-white" />
             </div>
           </div>
         </section>
 
-        {/* Gym Profile Card - Updated to Indigo Theme */}
+        {/* Gym Profile Card */}
         <div className="bg-gradient-to-br from-[#f0813d] to-[#9c4400] rounded-xl p-4 shadow-lg mx-1">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border-2 border-white/30">
-              <Building className="w-8 h-8 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border-2 border-white/30">
+              <Building className="w-7 h-7 text-white" />
             </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-white mb-1 truncate">{gymName}</h2>
-              <p className="text-white/90 text-sm">Administrator Dashboard</p>
-              <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1">
-                  <Users className="w-3 h-3 text-white/80" />
-                  <p className="text-white/90 text-xs">{loading ? "..." : totalMembers} Members</p>
-                </div>
-                <span className="text-white/30">•</span>
-                <div className="flex items-center gap-1">
-                  <Activity className="w-3 h-3 text-white/80" />
-                  <p className="text-white/90 text-xs">Active Today</p>
-                </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-white truncate">{gymName}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <Users className="w-3.5 h-3.5 text-white/80" />
+                <p className="text-white/90 text-sm font-semibold">{loading ? "..." : totalMembers} Members</p>
               </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/20">
-            <div className="text-center">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-1">
-                <SettingsIcon className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xs text-white/80">Settings</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-1">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xs text-white/80">Analytics</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-1">
-                <Wrench className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-xs text-white/80">Tools</p>
             </div>
           </div>
         </div>
