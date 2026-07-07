@@ -576,7 +576,6 @@ export default function TrainerAttendanceQuickPage() {
                                 Save Day
                               </button>
                             </div>
-                            </div>{/* end inner div */}
                           </div>{/* end day card */}
                         ))}
                       </div>
