@@ -237,7 +237,7 @@ export default function SettingsPage() {
               <Building className="h-7 w-7 text-white" />
             </div>
           </div>
-        </section>
+        {/* </section> */}
 
         {/* Gym Profile Card */}
         <div className="bg-gradient-to-br from-[#f0813d] to-[#9c4400] rounded-xl p-4 shadow-lg mx-1">
