@@ -745,10 +745,10 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
         <div className="p-4 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-gray-900">
+              <h3 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
                 {plan ? "Edit Workout Plan" : "Create Workout Plan"}
               </h3>
-              <p className="text-gray-500 text-xs mt-0.5">
+              <p className={`text-xs mt-0.5 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                 {plan ? "Update your workout plan details" : "Add a new workout plan for your gym"}
               </p>
             </div>
@@ -765,19 +765,29 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4">
           <div className="space-y-4">
             {/* Basic Info */}
-            <div className="bg-gray-50 rounded-xl p-3 space-y-3">
+            <div className={`rounded-xl p-3 space-y-3 ${
+              isDark ? "bg-[#262828]" : "bg-gray-50"
+            }`}>
               <div className="flex items-center gap-2">
                 <Dumbbell className="w-4 h-4 text-gray-500" />
-                <h4 className="font-semibold text-gray-900 text-sm">Basic Information</h4>
+                <h4 className={`font-semibold text-sm ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}>Basic Information</h4>
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className={`block text-xs font-medium mb-1 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                       }`}>
                   Plan Title *
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                  className={`w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm ${
+                    isDark
+                      ? "bg-[#2a2d2d] border border-white/10 text-white"
+                      : "bg-white border border-gray-200 text-gray-900"
+                  }`}
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
@@ -787,11 +797,17 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className={`block text-xs font-medium mb-1 ${
+                          isDark ? "text-gray-300" : "text-gray-700"
+                         }`}>
                     Goal
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                    className={`w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm ${
+                      isDark
+                        ? "bg-[#2a2d2d] border border-white/10 text-white"
+                        : "bg-white border border-gray-200 text-gray-900"
+                    }`}
                     value={formData.goal}
                     onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
                   >
@@ -803,11 +819,17 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className={`block text-xs font-medium mb-1 ${
+                          isDark ? "text-gray-300" : "text-gray-700"
+                         }`}>
                     Level
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                    className={`w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm ${
+                      isDark
+                        ? "bg-[#2a2d2d] border border-white/10 text-white"
+                        : "bg-white border border-gray-200 text-gray-900"
+                    }`}
                     value={formData.level}
                     onChange={(e) => setFormData({ ...formData, level: e.target.value })}
                   >
@@ -820,11 +842,17 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className={`block text-xs font-medium mb-1 ${
+                          isDark ? "text-gray-300" : "text-gray-700"
+                       }`}>
                   Description
                 </label>
                 <textarea
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all resize-none text-sm"
+                  className={`w-full px-3 py-2 resize-none rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm ${
+                    isDark
+                      ? "bg-[#2a2d2d] border border-white/10 text-white"
+                      : "bg-white border border-gray-200 text-gray-900"
+                  }`}
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -834,7 +862,9 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
 
               <div className="flex items-center justify-between pt-2">
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">Template Plan</p>
+                  <p className={`font-medium text-sm ${
+                    isDark ? "text-white" : "text-gray-900"
+                  }`}>Template Plan</p>
                   <p className="text-xs text-gray-500">Use as reusable template</p>
                 </div>
                 <button
@@ -857,7 +887,9 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
-                <h4 className="font-semibold text-gray-900 text-sm">Weekly Plan (Mon-Sat)</h4>
+                <h4 className={`font-semibold text-sm ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}>Weekly Plan (Mon-Sat)</h4>
               </div>
               
               <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -866,10 +898,19 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                   if (!day) return null;
 
                   return (
-                    <div key={dayNum} className="border border-gray-200 rounded-xl p-3">
+                    <div
+                      key={dayNum}
+                      className={`rounded-xl p-3 ${
+                        isDark
+                          ? "border border-white/10 bg-[#1f2121]"
+                          : "border border-gray-200"
+                      }`}
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <h5 className="font-semibold text-gray-900 text-sm">{day.day_name || DAY_NAMES[dayNum]}</h5>
+                          <h5 className={`font-semibold text-sm ${
+                            isDark ? "text-white" : "text-gray-900"
+                          }`}>{day.day_name || DAY_NAMES[dayNum]}</h5>
                           <input
                             type="text"
                             className="px-2 py-1 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
@@ -890,7 +931,14 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                       {day.exercises && day.exercises.length > 0 && (
                         <div className="space-y-2">
                           {day.exercises.map((exercise, exerciseIndex) => (
-                            <div key={exerciseIndex} className="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+                            <div
+                              key={exerciseIndex}
+                              className={`rounded-xl p-3 shadow-sm ${
+                                isDark
+                                  ? "bg-[#2a2d2d] border border-white/10"
+                                  : "bg-white border border-gray-200"
+                              }`}
+                            >
                               {/* Row 1: Exercise name + delete */}
                               <div className="flex items-center gap-2 mb-2">
                                 <input
@@ -990,7 +1038,11 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
         </form>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-gray-100 flex-shrink-0 flex gap-2">
+        <div
+          className={`p-4 border-t flex-shrink-0 flex gap-2 ${
+            isDark ? "border-white/10" : "border-gray-100"
+          }`}
+        >
           <button
             type="button"
             onClick={onClose}
