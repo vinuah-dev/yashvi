@@ -730,7 +730,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 safe-area-inset-bottom mb-17">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-3 safe-area-inset-bottom">
       <div className="bg-white w-full max-w-2xl rounded-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Modal Header */}
         <div className="p-4 border-b border-gray-100 flex-shrink-0">
