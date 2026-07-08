@@ -465,6 +465,9 @@ function WorkoutPlansContent() {
 // Workout Plan Modal Component
 function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
   const { showSuccess, showError } = useToast();
+  const isDark =
+  typeof document !== "undefined" &&
+  document.documentElement.dataset.theme === "dark";
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -731,7 +734,13 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 safe-area-inset-bottom mb-17">
-      <div className="bg-white w-full max-w-2xl rounded-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+      <div
+        className={`w-full max-w-2xl rounded-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col ${
+      isDark
+        ? "bg-[#1f2121] text-white"
+        : "bg-white text-gray-900"
+        }`}
+      >
         {/* Modal Header */}
         <div className="p-4 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center justify-between">
