@@ -201,7 +201,7 @@ function WorkoutPlansContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 safe-area-inset-bottom">
-      <Header title="Workout Plans" />
+      {!(showAddModal || editingPlan) && <Header title="Workout Plans" />}
 
       <main className="px-3 py-3 space-y-4">
         {/* Stats Cards - Mobile Optimized */}
