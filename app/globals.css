@@ -687,6 +687,39 @@ html[data-theme="dark"] select.dark-select option {
   color: #f7f2ef !important;
 }
 
+/* Workout plan modal — exercise card + its inputs.
+   The card is bg-white and the inputs are transparent, so in dark
+   mode they need explicit dark surfaces for readability. */
+html[data-theme="dark"] .wp-ex-card {
+  --dm-202:1;
+  background-color: #191b1b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .wp-field {
+  --dm-203:1;
+  background-color: #1f2121 !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .wp-field::placeholder {
+  --dm-204:1;
+  color: #8a8078 !important;
+}
+
+html[data-theme="dark"] .wp-field-time {
+  --dm-205:1;
+  background-color: rgba(240, 129, 61, 0.12) !important;
+  color: #f7f2ef !important;
+  border-color: rgba(240, 129, 61, 0.4) !important;
+}
+
+html[data-theme="dark"] .wp-field-time::placeholder {
+  --dm-206:1;
+  color: #b89478 !important;
+}
+
 html[data-theme="dark"] textarea::placeholder {
   --dm-35:1;
   color: #a99d97 !important;

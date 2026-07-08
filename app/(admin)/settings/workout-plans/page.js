@@ -768,7 +768,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                  className="wp-field w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
@@ -815,7 +815,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                   Description
                 </label>
                 <textarea
-                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all resize-none text-sm"
+                  className="wp-field w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all resize-none text-sm"
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -863,7 +863,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                           <h5 className="font-semibold text-gray-900 text-sm">{day.day_name || DAY_NAMES[dayNum]}</h5>
                           <input
                             type="text"
-                            className="px-2 py-1 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
+                            className="wp-field px-2 py-1 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
                             placeholder="Focus (e.g., Chest & Triceps)"
                             value={day.focus}
                             onChange={(e) => updateDayFocus(dayNum, e.target.value)}
@@ -881,12 +881,12 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                       {day.exercises && day.exercises.length > 0 && (
                         <div className="space-y-2">
                           {day.exercises.map((exercise, exerciseIndex) => (
-                            <div key={exerciseIndex} className="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+                            <div key={exerciseIndex} className="wp-ex-card bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
                               {/* Row 1: Exercise name + delete */}
                               <div className="flex items-center gap-2 mb-2">
                                 <input
                                   type="text"
-                                  className="flex-1 px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all font-medium"
+                                  className="wp-field flex-1 px-2.5 py-2 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all font-medium"
                                   placeholder="Exercise name"
                                   value={exercise.exercise_name}
                                   onChange={(e) => updateExercise(dayNum, exerciseIndex, "exercise_name", e.target.value)}
@@ -906,7 +906,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                                   <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Sets</label>
                                   <input
                                     type="number"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
+                                    className="wp-field w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
                                     placeholder="—"
                                     value={exercise.sets}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "sets", e.target.value)}
@@ -916,7 +916,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                                   <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Reps</label>
                                   <input
                                     type="text"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
+                                    className="wp-field w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center"
                                     placeholder="—"
                                     value={exercise.reps}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "reps", e.target.value)}
@@ -926,7 +926,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                                   <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Time (min)</label>
                                   <input
                                     type="number"
-                                    className="w-full px-2 py-1.5 border border-[#f0813d]/30 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center bg-[#fff8f4]"
+                                    className="wp-field-time w-full px-2 py-1.5 border border-[#f0813d]/30 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-center bg-[#fff8f4]"
                                     placeholder="—"
                                     value={exercise.timing_minutes || ""}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "timing_minutes", e.target.value)}
@@ -939,7 +939,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                                   <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Weight</label>
                                   <input
                                     type="text"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
+                                    className="wp-field w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
                                     placeholder="e.g. 20kg"
                                     value={exercise.weight}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "weight", e.target.value)}
@@ -949,7 +949,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                                   <label className="block text-[10px] font-semibold text-gray-400 mb-0.5 uppercase tracking-wide">Rest (sec)</label>
                                   <input
                                     type="number"
-                                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
+                                    className="wp-field w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all"
                                     placeholder="60"
                                     value={exercise.rest_seconds}
                                     onChange={(e) => updateExercise(dayNum, exerciseIndex, "rest_seconds", e.target.value)}
@@ -959,7 +959,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                               {/* Notes */}
                               <input
                                 type="text"
-                                className="w-full px-2 py-1.5 border border-gray-100 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all bg-gray-50 text-gray-600"
+                                className="wp-field w-full px-2 py-1.5 border border-gray-100 rounded-lg text-xs focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all bg-gray-50 text-gray-600"
                                 placeholder="Notes (optional)"
                                 value={exercise.notes || ""}
                                 onChange={(e) => updateExercise(dayNum, exerciseIndex, "notes", e.target.value)}
