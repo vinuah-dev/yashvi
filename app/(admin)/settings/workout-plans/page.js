@@ -782,7 +782,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                     Goal
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                    className="w-full px-3 py-2 bg-white dark-select border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
                     value={formData.goal}
                     onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
                   >
@@ -798,7 +798,7 @@ function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
                     Level
                   </label>
                   <select
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
+                    className="w-full px-3 py-2 bg-white dark-select border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm"
                     value={formData.level}
                     onChange={(e) => setFormData({ ...formData, level: e.target.value })}
                   >

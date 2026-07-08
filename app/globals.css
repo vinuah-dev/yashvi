@@ -669,6 +669,16 @@ html[data-theme="dark"] input::placeholder {
   color: #a99d97 !important;
 }
 
+/* Selects that also carry bg-white (which would otherwise win the
+   cascade and stay light). Higher specificity than .bg-white so the
+   closed select box renders dark in dark mode. */
+html[data-theme="dark"] select.dark-select {
+  --dm-200:1;
+  background-color: #1f2121 !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
 html[data-theme="dark"] textarea::placeholder {
   --dm-35:1;
   color: #a99d97 !important;
