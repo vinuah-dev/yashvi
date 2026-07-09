@@ -195,7 +195,7 @@ export function DateBandInput({ label, value, onChange, helper, presets = [] }) 
         type="date"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-3 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-900"
+        className="date-band-input mt-3 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-900"
       />
     </div>
   );

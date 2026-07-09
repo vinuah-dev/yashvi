@@ -720,6 +720,24 @@ html[data-theme="dark"] .wp-field-time::placeholder {
   color: #b89478 !important;
 }
 
+/* Date input (attendance "Select Attendance Date") — in dark mode
+   the box goes dark and the native calendar picker icon is inverted
+   so it stays visible instead of disappearing on a dark background. */
+html[data-theme="dark"] .date-band-input {
+  --dm-207:1;
+  background-color: #1f2121 !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .date-band-input::-webkit-calendar-picker-indicator {
+  --dm-208:1;
+  filter: invert(0.9) sepia(0.1) brightness(1.5);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
 html[data-theme="dark"] textarea::placeholder {
   --dm-35:1;
   color: #a99d97 !important;
