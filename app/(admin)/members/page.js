@@ -1310,6 +1310,8 @@ Best regards,
   onChange={(e) => setSearchQuery(e.target.value)}
   className="w-full pl-11 pr-4 py-3 bg-[#f5f5f5] border border-[#ececec] rounded-2xl focus:ring-2 focus:ring-[#f0813d]/20 focus:border-[#f0813d] outline-none transition-all text-sm text-[#1a1c1c] placeholder:text-[#8b8b8b] shadow-inner"
 />
+          </div>
+
 <div className="flex gap-2 overflow-x-auto no-scrollbar pt-3">
   {filterTabs.map((tab) => {
     const isActiveFilter = filterStatus === tab.id;
@@ -1339,7 +1341,6 @@ Best regards,
     );
   })}
 </div>
-          </div>
 
           {/* Compact Action Icons */}
           <div className={`grid gap-2 ${canViewFinance ? "grid-cols-2 md:grid-cols-3" : "grid-cols-1"}`}>
