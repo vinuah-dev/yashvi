@@ -672,8 +672,6 @@ html[data-theme="dark"] input::placeholder {
 /* Selects that also carry bg-white (which would otherwise win the
    cascade and stay light). Higher specificity than .bg-white so the
    closed select box renders dark in dark mode. */
-html[data-theme="dark"] select.dm-select,
-html[data-theme="dark"] .dm-select,
 html[data-theme="dark"] select.dark-select,
 html[data-theme="dark"] .dark-select {
   --dm-200:1;
@@ -683,7 +681,6 @@ html[data-theme="dark"] .dark-select {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-html[data-theme="dark"] select.dm-select option,
 html[data-theme="dark"] select.dark-select option {
   --dm-201:1;
   background-color: #1f2121 !important;
@@ -699,7 +696,6 @@ html[data-theme="dark"] .wp-ex-card {
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-html[data-theme="dark"] .dm-field,
 html[data-theme="dark"] .wp-field {
   --dm-203:1;
   background-color: #1f2121 !important;
@@ -707,7 +703,6 @@ html[data-theme="dark"] .wp-field {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-html[data-theme="dark"] .dm-field::placeholder,
 html[data-theme="dark"] .wp-field::placeholder {
   --dm-204:1;
   color: #8a8078 !important;
@@ -3040,9 +3035,195 @@ html:not([data-theme="dark"]) .trainer-balanced-theme :is(
   color: #f0813d !important;
 }
 
-/* When a full-screen modal is open, hide the mobile bottom navigation
-   so it doesn't peek through the modal backdrop. Toggled by adding
-   `modal-open` to <body> while the modal is mounted. */
-body.modal-open .app-bottom-nav {
-  display: none !important;
+/* ============================================================
+   GLOBAL DARK FORM CONTROLS
+   ------------------------------------------------------------
+   Many inputs/selects/textareas across the app carry `bg-white`
+   (or another light bg utility) directly on the element. A class
+   selector like `html[data-theme="dark"] .bg-white` has higher
+   specificity than the element rule `html[data-theme="dark"] select`,
+   so those controls kept rendering light in dark mode.
+
+   Adding an attribute selector to the element ([class]) raises this
+   rule's specificity above any single utility class, so every form
+   control gets a proper dark surface regardless of which bg utility
+   it happens to carry. Checkboxes/radios/ranges are excluded so their
+   accent colors keep working.
+   ============================================================ */
+html[data-theme="dark"] input[class]:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+html[data-theme="dark"] select[class],
+html[data-theme="dark"] textarea[class] {
+  --dm-form:1;
+  background-color: #1f2121 !important;
+  background-image: none !important;
+  color: #f7f2ef !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] input[class]::placeholder,
+html[data-theme="dark"] textarea[class]::placeholder {
+  --dm-form-ph:1;
+  color: #8a8078 !important;
+}
+
+/* Native pickers (date/time) follow the dark system palette and keep
+   their indicator icon visible against the dark field. */
+html[data-theme="dark"] input[type="date"],
+html[data-theme="dark"] input[type="time"],
+html[data-theme="dark"] input[type="datetime-local"],
+html[data-theme="dark"] input[type="month"] {
+  --dm-form-date:1;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+html[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
+html[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+html[data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator {
+  --dm-form-ind:1;
+  filter: invert(.9) sepia(.1) brightness(1.5);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] select[class] option {
+  --dm-form-opt:1;
+  background-color: #1f2121 !important;
+  color: #f7f2ef !important;
+}
+
+/* Sticky action-bar fade gradients (e.g. "Save All Assignments" bar).
+   `via-gray-50` had no dark mapping, so the light fade showed up as a
+   white glow behind the button in dark mode. */
+html[data-theme="dark"] .via-gray-50 {
+  --dm-via-gray-50:1;
+  --tw-gradient-via: #1f2121 var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .via-gray-100 {
+  --dm-via-gray-100:1;
+  --tw-gradient-via: #252727 var(--tw-gradient-via-position) !important;
+}
+
+/* Remaining light gradient stops used on member list / add-member cards.
+   Without dark mappings these render as pale silver/cream washes over
+   otherwise-dark cards. Mapped to the same neutral + orange-tint scale
+   used by the rest of the dark theme. */
+html[data-theme="dark"] .from-gray-100 {
+  --dm-fg100:1;
+  --tw-gradient-from: #252727 var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-50 {
+  --dm-tg50:1;
+  --tw-gradient-to: #1f2121 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .from-orange-50 {
+  --dm-fo50:1;
+  --tw-gradient-from: rgba(240, 129, 61, 0.12) var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-orange-100 {
+  --dm-fo100:1;
+  --tw-gradient-from: rgba(240, 129, 61, 0.18) var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .to-orange-50 {
+  --dm-to50:1;
+  --tw-gradient-to: rgba(240, 129, 61, 0.12) var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-orange-100 {
+  --dm-to100:1;
+  --tw-gradient-to: rgba(240, 129, 61, 0.18) var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .via-orange-100 {
+  --dm-vo100:1;
+  --tw-gradient-via: rgba(240, 129, 61, 0.18) var(--tw-gradient-via-position) !important;
+}
+
+/* Remaining light gradient stops swept from the whole app so no card
+   keeps a pale wash in dark mode. */
+
+html[data-theme="dark"] .from-gray-200 {
+  --dm-gs0:1;
+  --tw-gradient-from: #2d2f2f var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-gray-300 {
+  --dm-gs1:1;
+  --tw-gradient-from: #3a3c3c var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-gray-400 {
+  --dm-gs2:1;
+  --tw-gradient-from: #4a4c4c var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-orange-50\/50 {
+  --dm-gs3:1;
+  --tw-gradient-from: rgba(240, 129, 61, 0.08) var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .from-white\/80 {
+  --dm-gs4:1;
+  --tw-gradient-from: rgba(31, 33, 33, 0.8) var(--tw-gradient-from-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-200 {
+  --dm-gs5:1;
+  --tw-gradient-to: #2d2f2f var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-300 {
+  --dm-gs6:1;
+  --tw-gradient-to: #3a3c3c var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-400 {
+  --dm-gs7:1;
+  --tw-gradient-to: #4a4c4c var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-gray-500 {
+  --dm-gs8:1;
+  --tw-gradient-to: #5a5c5c var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-orange-100\/50 {
+  --dm-gs9:1;
+  --tw-gradient-to: rgba(240, 129, 61, 0.1) var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-orange-200 {
+  --dm-gs10:1;
+  --tw-gradient-to: rgba(240, 129, 61, 0.24) var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-slate-50 {
+  --dm-gs11:1;
+  --tw-gradient-to: #1f2121 var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .to-zinc-850 {
+  --dm-gs12:1;
+  --tw-gradient-to: #1c1e1e var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .via-orange-50\/70 {
+  --dm-gs13:1;
+  --tw-gradient-via: rgba(240, 129, 61, 0.1) var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .via-white\/40 {
+  --dm-gs14:1;
+  --tw-gradient-via: rgba(255, 255, 255, 0.06) var(--tw-gradient-via-position) !important;
+}
+
+html[data-theme="dark"] .via-white\/70 {
+  --dm-gs15:1;
+  --tw-gradient-via: rgba(255, 255, 255, 0.08) var(--tw-gradient-via-position) !important;
 }

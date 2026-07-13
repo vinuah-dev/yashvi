@@ -294,30 +294,31 @@ export default function AdminShopPage() {
           ) : (
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map(item => (
-                <div key={item.id} className={`bg-white rounded-[24px] shadow-sm border border-[#f0dfcf] p-3 ${!item.is_active ? "opacity-70" : ""}`}>
-                  <div className="flex items-start gap-3">
+                <div key={item.id} className={`bg-white rounded-[24px] shadow-sm border border-[#f0dfcf] p-3 overflow-hidden ${!item.is_active ? "opacity-70" : ""}`}>
+                  <div className="flex items-start gap-3 min-w-0">
                     <div className="w-20 h-20 overflow-hidden rounded-2xl bg-gradient-to-br from-[#fff2df] to-[#eaf8e6] flex items-center justify-center flex-shrink-0">
                       {item.image_url ? <img src={item.image_url} alt={`${item.name} product`} className="h-full w-full object-cover" /> : <Package className="w-8 h-8 text-[#f0813d]" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
                         <h3 className="font-black text-[#3a2b21] text-sm truncate min-w-0">{item.name}</h3>
                         <span className="text-xs bg-[#fff2df] text-[#c46a25] px-2 py-0.5 rounded-full capitalize font-bold shrink-0 whitespace-nowrap">{item.category}</span>
                         {!item.is_active && <span className="text-xs bg-[#ffe9e4] text-[#d45b3c] px-2 py-0.5 rounded-full font-bold shrink-0 whitespace-nowrap">Hidden</span>}
                       </div>
-                      {item.description && <p className="text-xs text-[#8b7a6c] mt-0.5 line-clamp-2">{item.description}</p>}
+                      {item.description && <p className="text-xs text-[#8b7a6c] mt-0.5 line-clamp-2 break-words">{item.description}</p>}
                       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         <span className="text-base font-black text-gray-800">₹{item.price}</span>
-                        <span className={`text-xs font-bold ${item.stock !== -1 && Number(item.stock || 0) <= 5 ? "text-[#d45b3c]" : "text-[#4f8f36]"}`}>{item.stock === -1 ? "Unlimited stock" : `${item.stock} in stock`}</span>
+                        <span className={`text-xs font-bold whitespace-nowrap ${item.stock !== -1 && Number(item.stock || 0) <= 5 ? "text-[#d45b3c]" : "text-[#4f8f36]"}`}>{item.stock === -1 ? "Unlimited stock" : `${item.stock} in stock`}</span>
                       </div>
                     </div>
-                    <div className="flex gap-1 flex-shrink-0">
-                      <button onClick={() => handleToggleItem(item)} className="w-8 h-8 rounded-xl bg-[#fff2df] flex items-center justify-center text-[#c46a25]">
-                        {item.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                      <button onClick={() => { setEditItem(item); setShowItemModal(true); }} className="w-8 h-8 rounded-xl bg-[#eaf8e6] flex items-center justify-center text-[#4f8f36]"><Edit3 className="w-4 h-4" /></button>
-                      <button onClick={() => setConfirmDelete(item)} className="w-8 h-8 rounded-xl bg-[#ffe9e4] flex items-center justify-center text-[#d45b3c]"><Trash2 className="w-4 h-4" /></button>
-                    </div>
+                  </div>
+                  {/* Actions: own row so they are never cut off on narrow screens */}
+                  <div className="mt-3 flex justify-end gap-2 border-t border-[#f5e7d8] pt-2.5">
+                    <button onClick={() => handleToggleItem(item)} className="w-9 h-9 rounded-xl bg-[#fff2df] flex items-center justify-center text-[#c46a25] active:scale-95" title={item.is_active ? "Hide item" : "Show item"}>
+                      {item.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => { setEditItem(item); setShowItemModal(true); }} className="w-9 h-9 rounded-xl bg-[#eaf8e6] flex items-center justify-center text-[#4f8f36] active:scale-95" title="Edit item"><Edit3 className="w-4 h-4" /></button>
+                    <button onClick={() => setConfirmDelete(item)} className="w-9 h-9 rounded-xl bg-[#ffe9e4] flex items-center justify-center text-[#d45b3c] active:scale-95" title="Delete item"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>
               ))}
