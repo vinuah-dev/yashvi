@@ -181,7 +181,7 @@ export default function BottomNav({ role = "admin" }) {
   const isCompact = navItems.length > 5;
 
   return (
-   <div className="fixed bottom-4 left-0 right-0 z-50 px-3 pointer-events-none md:hidden">
+   <div className="app-bottom-nav fixed bottom-4 left-0 right-0 z-50 px-3 pointer-events-none md:hidden">
       <nav className="pointer-events-auto mx-auto max-w-md">
         <div
           className="

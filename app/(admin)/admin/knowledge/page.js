@@ -71,6 +71,16 @@ export default function AdminKnowledgePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+
+  // Hide the mobile bottom nav while the post form modal is open.
+  useEffect(() => {
+    if (formOpen) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+    return () => document.body.classList.remove("modal-open");
+  }, [formOpen]);
   const [form, setForm] = useState(emptyForm);
 
   const canManage = ["superadmin", "owner", "admin"].includes(role);
@@ -423,7 +433,7 @@ export default function AdminKnowledgePage() {
       </main>
 
       {formOpen && (
-        <div className="fixed inset-0 z-[80] flex items-end bg-black/50 p-3 sm:items-center sm:justify-center">
+        <div className="fixed inset-0 z-[110] flex items-end bg-black/50 p-3 sm:items-center sm:justify-center">
           <form
             onSubmit={handleSubmit}
             className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
@@ -453,7 +463,7 @@ export default function AdminKnowledgePage() {
                   onChange={(event) => updateForm("title", event.target.value)}
                   maxLength={255}
                   required
-                  className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                  className="dm-field mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   placeholder="Example: Simple protein snacks after workout"
                 />
               </label>
@@ -465,7 +475,7 @@ export default function AdminKnowledgePage() {
                   onChange={(event) => updateForm("excerpt", event.target.value)}
                   required
                   rows={3}
-                  className="mt-2 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                  className="dm-field mt-2 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   placeholder="A quick preview members will see in the list."
                 />
               </label>
@@ -477,7 +487,7 @@ export default function AdminKnowledgePage() {
                   onChange={(event) => updateForm("content", event.target.value)}
                   required
                   rows={8}
-                  className="mt-2 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm leading-6 outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                  className="dm-field mt-2 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm leading-6 outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   placeholder="Write the full health, diet, workout, or recovery guidance."
                 />
               </label>
@@ -488,7 +498,7 @@ export default function AdminKnowledgePage() {
                   type="url"
                   value={form.image_url}
                   onChange={(event) => updateForm("image_url", event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                  className="dm-field mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   placeholder="https://example.com/knowledge-image.jpg"
                 />
                 <span className="mt-1 block text-xs text-gray-500">
@@ -510,7 +520,7 @@ export default function AdminKnowledgePage() {
                   <select
                     value={form.category}
                     onChange={(event) => updateForm("category", event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                    className="dm-select mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   >
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
@@ -525,7 +535,7 @@ export default function AdminKnowledgePage() {
                   <select
                     value={form.status}
                     onChange={(event) => updateForm("status", event.target.value)}
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
+                    className="dm-select mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-orange-100"
                   >
                     <option value="published">Published</option>
                     <option value="draft">Draft</option>

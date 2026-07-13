@@ -101,6 +101,7 @@ export default function WorkoutPage() {
                 exercise_name,
                 sets,
                 reps,
+                timing_minutes,
                 weight,
                 rest_seconds,
                 notes,
@@ -341,6 +342,12 @@ export default function WorkoutPage() {
                               {exercise.reps} Reps
                             </span>
                           )}
+                          {exercise.timing_minutes && (
+                            <span className="px-2 py-0.5 bg-[#f0813d]/10 border border-[#f0813d]/20 text-[#f0813d] text-[10px] font-bold rounded-md flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {exercise.timing_minutes} min
+                            </span>
+                          )}
                           {exercise.weight && (
                             <span className="px-2 py-0.5 bg-[#9c4400]/10 border border-[#9c4400]/15 text-[#9c4400] text-[10px] font-bold rounded-md">
                               {exercise.weight}
@@ -482,6 +489,12 @@ export default function WorkoutPage() {
                                           {exercise.reps && (
                                             <span className="px-2 py-0.5 bg-zinc-800 border border-white/5 text-zinc-300 text-[10px] font-bold rounded-md">
                                               {exercise.reps} Reps
+                                            </span>
+                                          )}
+                                          {exercise.timing_minutes && (
+                                            <span className="px-2 py-0.5 bg-[#f0813d]/10 border border-[#f0813d]/20 text-[#f0813d] text-[10px] font-bold rounded-md flex items-center gap-1">
+                                              <Clock className="w-3 h-3" />
+                                              {exercise.timing_minutes} min
                                             </span>
                                           )}
                                           {exercise.weight && (

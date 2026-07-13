@@ -227,7 +227,7 @@ export default function AdminShopPage() {
   if (loading) return (<div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100"><Header title="Shop" /><div className="flex items-center justify-center py-20"><div className="w-12 h-12 border-4 border-[#f0813d] border-t-transparent rounded-full animate-spin"></div></div></div>);
 
   return (
-    <div className="min-h-screen bg-[#fff7ef] mb-17 safe-area-inset-bottom">
+    <div className="min-h-screen bg-[#fff7ef] mb-17 safe-area-inset-bottom overflow-x-hidden">
       <Header title="Shop Management" />
       <main className="px-3 md:px-8 py-3 space-y-4 max-w-7xl mx-auto">
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#ffcf9b] via-[#fff0dc] to-[#ddf7df] p-5 border border-white shadow-[0_18px_55px_rgba(232,139,63,0.18)]">
@@ -300,13 +300,13 @@ export default function AdminShopPage() {
                       {item.image_url ? <img src={item.image_url} alt={`${item.name} product`} className="h-full w-full object-cover" /> : <Package className="w-8 h-8 text-[#f0813d]" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-black text-[#3a2b21] text-sm truncate">{item.name}</h3>
-                        <span className="text-xs bg-[#fff2df] text-[#c46a25] px-2 py-0.5 rounded-full capitalize font-bold">{item.category}</span>
-                        {!item.is_active && <span className="text-xs bg-[#ffe9e4] text-[#d45b3c] px-2 py-0.5 rounded-full font-bold">Hidden</span>}
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="font-black text-[#3a2b21] text-sm truncate min-w-0">{item.name}</h3>
+                        <span className="text-xs bg-[#fff2df] text-[#c46a25] px-2 py-0.5 rounded-full capitalize font-bold shrink-0 whitespace-nowrap">{item.category}</span>
+                        {!item.is_active && <span className="text-xs bg-[#ffe9e4] text-[#d45b3c] px-2 py-0.5 rounded-full font-bold shrink-0 whitespace-nowrap">Hidden</span>}
                       </div>
                       {item.description && <p className="text-xs text-[#8b7a6c] mt-0.5 line-clamp-2">{item.description}</p>}
-                      <div className="flex items-center gap-3 mt-1.5">
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                         <span className="text-base font-black text-gray-800">₹{item.price}</span>
                         <span className={`text-xs font-bold ${item.stock !== -1 && Number(item.stock || 0) <= 5 ? "text-[#d45b3c]" : "text-[#4f8f36]"}`}>{item.stock === -1 ? "Unlimited stock" : `${item.stock} in stock`}</span>
                       </div>

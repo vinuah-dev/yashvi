@@ -672,6 +672,8 @@ html[data-theme="dark"] input::placeholder {
 /* Selects that also carry bg-white (which would otherwise win the
    cascade and stay light). Higher specificity than .bg-white so the
    closed select box renders dark in dark mode. */
+html[data-theme="dark"] select.dm-select,
+html[data-theme="dark"] .dm-select,
 html[data-theme="dark"] select.dark-select,
 html[data-theme="dark"] .dark-select {
   --dm-200:1;
@@ -681,6 +683,7 @@ html[data-theme="dark"] .dark-select {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
+html[data-theme="dark"] select.dm-select option,
 html[data-theme="dark"] select.dark-select option {
   --dm-201:1;
   background-color: #1f2121 !important;
@@ -696,6 +699,7 @@ html[data-theme="dark"] .wp-ex-card {
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+html[data-theme="dark"] .dm-field,
 html[data-theme="dark"] .wp-field {
   --dm-203:1;
   background-color: #1f2121 !important;
@@ -703,6 +707,7 @@ html[data-theme="dark"] .wp-field {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
+html[data-theme="dark"] .dm-field::placeholder,
 html[data-theme="dark"] .wp-field::placeholder {
   --dm-204:1;
   color: #8a8078 !important;
@@ -3033,4 +3038,11 @@ html:not([data-theme="dark"]) .trainer-balanced-theme :is(
 
 .member-light-theme .relative.overflow-hidden .absolute.bg-cover ~ .relative .text-\[\#f0813d\] {
   color: #f0813d !important;
+}
+
+/* When a full-screen modal is open, hide the mobile bottom navigation
+   so it doesn't peek through the modal backdrop. Toggled by adding
+   `modal-open` to <body> while the modal is mounted. */
+body.modal-open .app-bottom-nav {
+  display: none !important;
 }

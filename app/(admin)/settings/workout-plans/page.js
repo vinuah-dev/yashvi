@@ -466,6 +466,13 @@ function WorkoutPlansContent() {
 function WorkoutPlanModal({ plan, gymId, onClose, onSave }) {
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
+
+  // Hide the mobile bottom nav while this modal is open.
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+    return () => document.body.classList.remove("modal-open");
+  }, []);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
