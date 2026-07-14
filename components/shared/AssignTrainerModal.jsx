@@ -11,6 +11,7 @@ import {
 import { useToast } from "@/contexts/ToastContext";
 import { DAYS_OF_WEEK } from "@/lib/constants/trainerSchedule";
 import { useUserRole } from "@/lib/hooks/useUserRole";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const PAYMENT_MODE_OPTIONS = ["cash", "upi", "card", "bank"];
 
@@ -43,6 +44,7 @@ export default function AssignTrainerModal({
   currentTrainerId,
   assignMode = "default",
 }) {
+  const { user: authUser } = useAuthContext();
   const router = useRouter();
   const [trainers, setTrainers] = useState([]);
   const [selectedTrainerId, setSelectedTrainerId] = useState(null);
@@ -483,8 +485,8 @@ export default function AssignTrainerModal({
 
     setLoading(true);
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      const assignedBy = authData?.user?.id;
+      // Custom auth (AuthContext), not Supabase Auth sessions.
+      const assignedBy = authUser?.id;
 
       const closeDate = new Date().toISOString().split("T")[0];
       // 1. Soft-close existing active assignments (never delete — history preserved)

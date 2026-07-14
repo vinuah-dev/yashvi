@@ -2,39 +2,47 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export default function ResolvePendingPaymentModal({ payment, member, onClose, onResolved, onResolve }) {
+    const { user: authUser } = useAuthContext();
     const [paymentMode, setPaymentMode] = useState("cash");
     const [receivedAmount, setReceivedAmount] = useState(payment.amount);
     const [loading, setLoading] = useState(false);
     const [collectorInfo, setCollectorInfo] = useState(null);
 
-    // Get current user info to track who collected the payment
+    // Get current user info to track who collected the payment.
+    // This app uses its own auth (AuthContext-backed session), not Supabase
+    // Auth sessions, so the logged-in admin comes from there.
     useEffect(() => {
         const fetchCollectorInfo = async () => {
+            if (!authUser?.id) return;
             try {
-                const { data: authData } = await supabase.auth.getUser();
-                if (authData?.user) {
-                    const { data: profile } = await supabase
-                        .from("profiles")
-                        .select("id, first_name, last_name, role")
-                        .eq("id", authData.user.id)
-                        .single();
-                    
-                    if (profile) {
-                        setCollectorInfo({
-                            id: profile.id,
-                            name: `${profile.first_name} ${profile.last_name}`.trim(),
-                            role: profile.role
-                        });
-                    }
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("id, first_name, last_name, role")
+                    .eq("id", authUser.id)
+                    .single();
+
+                if (profile) {
+                    setCollectorInfo({
+                        id: profile.id,
+                        name: `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
+                        role: profile.role
+                    });
+                } else {
+                    setCollectorInfo({
+                        id: authUser.id,
+                        name: authUser.name || "",
+                        role: authUser.role || null
+                    });
                 }
             } catch (err) {
                 console.error("Error fetching collector info:", err);
             }
         };
         fetchCollectorInfo();
-    }, []);
+    }, [authUser]);
 
     const handleResolvePayment = async (e) => {
         e.preventDefault();

@@ -59,7 +59,7 @@ export default function AssignMembersPage({ params }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const { selectedGym } = useAuthContext();
+  const { selectedGym , user } = useAuthContext();
   const [success, setSuccess] = useState(false);
 
   // Trainer schedule & plans
@@ -402,8 +402,8 @@ export default function AssignMembersPage({ params }) {
 
     setSaving(true);
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      const assignedBy = authData?.user?.id;
+      // Custom auth (AuthContext), not Supabase Auth sessions.
+      const assignedBy = user?.id;
 
       // Process new assignments
       for (const [memberId, config] of newConfigs) {

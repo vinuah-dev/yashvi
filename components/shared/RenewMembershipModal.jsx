@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { createPaymentReceipt } from "@/lib/receiptGenerator";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const preventScrollChange = (e) => {
   e.preventDefault();
@@ -54,6 +55,7 @@ const getTodayString = () => {
 };
 
 export default function RenewMembershipModal({ member, gymId, gymData, onClose, onRenew }) {
+  const { user: authUser } = useAuthContext();
     const [membershipPlans, setMembershipPlans] = useState([]);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [customPrice, setCustomPrice] = useState("");
@@ -202,8 +204,8 @@ export default function RenewMembershipModal({ member, gymId, gymData, onClose, 
                 }
             }
 
-            const { data: authData } = await supabase.auth.getUser();
-            const currentUserId = authData?.user?.id || null;
+            // Custom auth (AuthContext), not Supabase Auth sessions.
+            const currentUserId = authUser?.id || null;
             if (!currentUserId) {
                 alert("Session expired. Please login again.");
                 setLoading(false);

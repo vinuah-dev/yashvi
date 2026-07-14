@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Sparkles,
 } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export default function AssignAmenityModal({
   isOpen,
@@ -21,6 +22,7 @@ export default function AssignAmenityModal({
   selectedGym,
   onSuccess,
 }) {
+  const { user: authUser } = useAuthContext();
   const { showSuccess, showError } = useToast();
   const [amenities, setAmenities] = useState([]);
   const [assignedAmenityIds, setAssignedAmenityIds] = useState([]);
@@ -94,8 +96,8 @@ export default function AssignAmenityModal({
 
     setLoading(true);
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      const assignedBy = authData?.user?.id;
+      // Custom auth (AuthContext), not Supabase Auth sessions.
+      const assignedBy = authUser?.id;
 
       for (const amenity of selectedAmenities) {
         // 1. Create payment record

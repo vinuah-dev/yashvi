@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Header from "@/components/layout/Header";
 import { useToast } from "@/contexts/ToastContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 import {
   MessageCircle,
   Users,
@@ -187,6 +188,7 @@ export default function WhatsAppMessagingPage() {
   const { showSuccess, showError } = useToast();
 
   // ─── State ───────────────────────────────────────────────────
+  const { user: authUser } = useAuthContext();
   const [selectedGym, setSelectedGym] = useState(null);
   const [loading, setLoading] = useState(true);
   const [membersLoading, setMembersLoading] = useState(false);
@@ -290,8 +292,8 @@ export default function WhatsAppMessagingPage() {
     setMembersLoading(true);
     try {
       if (selectedCategory === "pending") {
-        const { data: authData } = await supabase.auth.getUser();
-        const currentUserId = authData?.user?.id || null;
+        // Custom auth (AuthContext), not Supabase Auth sessions.
+        const currentUserId = authUser?.id || null;
         if (!currentUserId) {
           throw new Error("Session expired");
         }

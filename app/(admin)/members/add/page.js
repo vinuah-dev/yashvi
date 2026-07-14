@@ -43,7 +43,7 @@ export default function AddMemberPage() {
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const { selectedGym } = useAuthContext();
+  const { selectedGym, user: authUser } = useAuthContext();
   const [membershipPlans, setMembershipPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   
@@ -296,10 +296,15 @@ export default function AddMemberPage() {
         throw new Error(`Invalid duration for plan "${selectedPlan.name}". Please ensure the plan has a valid duration_days value in the database.`);
       }
 
-      const { data: authData } = await supabase.auth.getUser();
-      const currentUser = authData?.user || null;
+      // This app uses its own auth (profiles / AuthContext-backed localStorage
+      // session), not Supabase Auth sessions — so supabase.auth.getUser() is
+      // always empty here and must not be used to identify the admin.
+      const currentUser = authUser || null;
       const createdBy = currentUser?.id || null;
-      const createdByName = currentUser?.name || null;
+      const createdByName =
+        currentUser?.name ||
+        [currentUser?.first_name, currentUser?.last_name].filter(Boolean).join(" ") ||
+        null;
 
       if (!createdBy) {
         showError("Session expired. Please login again.");
@@ -498,7 +503,14 @@ export default function AddMemberPage() {
 
     } catch (error) {
       console.error("Error adding member:", error);
-      showError("Failed to add member. Please try again.");
+      // Surface the real reason instead of a generic message so the failure
+      // is actually actionable (missing plan, DB constraint, auth, etc.).
+      const reason =
+        error?.message ||
+        error?.error_description ||
+        error?.details ||
+        (typeof error === "string" ? error : "");
+      showError(reason ? `Failed to add member: ${reason}` : "Failed to add member. Please try again.");
     }
     setLoading(false);
   };

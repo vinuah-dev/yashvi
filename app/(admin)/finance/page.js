@@ -406,8 +406,8 @@ export default function FinancePage() {
       const startISO = periodStart.toISOString();
       const endISO = periodEnd.toISOString();
 
-      const { data: authData } = await supabase.auth.getUser();
-      const currentUserId = authData?.user?.id || null;
+      // Custom auth (AuthContext), not Supabase Auth sessions.
+      const currentUserId = user?.id || null;
       if (!currentUserId) {
         throw new Error("Missing authenticated user");
       }
