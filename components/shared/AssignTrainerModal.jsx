@@ -45,6 +45,13 @@ export default function AssignTrainerModal({
   assignMode = "default",
 }) {
   const { user: authUser } = useAuthContext();
+
+  // Hide the mobile bottom navigation while this modal is open so the
+  // footer action buttons (Cancel / Assign Trainer) are never covered.
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+    return () => document.body.classList.remove("modal-open");
+  }, []);
   const router = useRouter();
   const [trainers, setTrainers] = useState([]);
   const [selectedTrainerId, setSelectedTrainerId] = useState(null);
@@ -808,7 +815,7 @@ export default function AssignTrainerModal({
         : "Select trainer & schedule";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-fadeIn">
       {/* Backdrop with blur */}
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -1107,20 +1114,20 @@ export default function AssignTrainerModal({
 
                           <div className="bg-gradient-to-r from-orange-50 to-orange-50 border border-orange-100 rounded-xl p-3">
                             <p className="text-xs font-semibold text-orange-800 mb-2">Installment Summary:</p>
-                            <div className="flex items-center gap-3">
-                              <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                                <p className="text-[10px] text-gray-500 uppercase">Collected</p>
-                                <p className="text-sm font-bold text-[#f0813d]">₹{ptReceivedAmount.toLocaleString("en-IN")}</p>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                                <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Collected</p>
+                                <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptReceivedAmount.toLocaleString("en-IN")}</p>
                               </div>
-                              <div className="text-gray-400 text-xs">+</div>
-                              <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                                <p className="text-[10px] text-gray-500 uppercase">Remaining</p>
-                                <p className="text-sm font-bold text-[#f0813d]">₹{ptOutstandingAfterPayment.toLocaleString("en-IN")}</p>
+                              <div className="relative bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                                <span className="absolute -left-[11px] top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">+</span>
+                                <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Remaining</p>
+                                <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptOutstandingAfterPayment.toLocaleString("en-IN")}</p>
                               </div>
-                              <div className="text-gray-400 text-xs">=</div>
-                              <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                                <p className="text-[10px] text-gray-500 uppercase">Contract</p>
-                                <p className="text-sm font-bold text-[#f0813d]">₹{ptPlanTotalAmount.toLocaleString("en-IN")}</p>
+                              <div className="relative bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                                <span className="absolute -left-[11px] top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">=</span>
+                                <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Contract</p>
+                                <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptPlanTotalAmount.toLocaleString("en-IN")}</p>
                               </div>
                             </div>
                             {ptPlanDuration ? (
@@ -1366,20 +1373,20 @@ export default function AssignTrainerModal({
                         {isCurrentAssignmentSelected ? "Installment Summary:" : "Payment Summary:"}
                       </p>
                       {ptPlanName && (
-                          <div className="flex items-center gap-3">
-                            <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                              <p className="text-[10px] text-gray-500 uppercase">Collected</p>
-                              <p className="text-sm font-bold text-[#f0813d]">₹{ptReceivedAmount.toLocaleString("en-IN")}</p>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                              <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Collected</p>
+                              <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptReceivedAmount.toLocaleString("en-IN")}</p>
                             </div>
-                            <div className="text-gray-400 text-xs">+</div>
-                            <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                              <p className="text-[10px] text-gray-500 uppercase">Remaining</p>
-                              <p className="text-sm font-bold text-[#f0813d]">₹{ptOutstandingAfterPayment.toLocaleString("en-IN")}</p>
+                            <div className="relative bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                              <span className="absolute -left-[11px] top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">+</span>
+                              <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Remaining</p>
+                              <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptOutstandingAfterPayment.toLocaleString("en-IN")}</p>
                             </div>
-                            <div className="text-gray-400 text-xs">=</div>
-                            <div className="flex-1 bg-white rounded-lg p-2 text-center border border-orange-100">
-                              <p className="text-[10px] text-gray-500 uppercase">Contract</p>
-                              <p className="text-sm font-bold text-[#f0813d]">₹{ptPlanTotalAmount.toLocaleString("en-IN")}</p>
+                            <div className="relative bg-white rounded-lg px-2 py-2.5 text-center border border-orange-100 min-w-0">
+                              <span className="absolute -left-[11px] top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">=</span>
+                              <p className="text-[9px] text-gray-500 uppercase tracking-wide leading-tight">Contract</p>
+                              <p className="text-sm font-bold text-[#f0813d] mt-0.5 truncate">₹{ptPlanTotalAmount.toLocaleString("en-IN")}</p>
                             </div>
                           </div>
                       )}
@@ -1579,8 +1586,9 @@ export default function AssignTrainerModal({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="bg-gradient-to-t from-white via-white to-gray-50 p-5 rounded-b-2xl border-t border-gray-200/60 shadow-lg">
+        {/* Footer — sticky so the action buttons stay reachable while the
+            content above scrolls */}
+        <div className="sticky bottom-0 z-10 bg-white p-5 rounded-b-2xl border-t border-gray-200/60 shadow-[0_-8px_24px_rgba(0,0,0,0.08)]">
           {showWarning ? (
             <div className="space-y-4">
               <div className="bg-gradient-to-r from-orange-50 to-orange-50 border border-orange-200 rounded-xl p-4">
