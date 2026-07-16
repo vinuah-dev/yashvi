@@ -457,8 +457,11 @@ export default function MembersPage() {
       try {
         const hasExpiredRangeFilter =
           filterStatus === "expired" && (expiredStartDate || expiredEndDate);
-        const requestPage = hasExpiredRangeFilter ? 1 : currentPage;
-        const requestPageSize = hasExpiredRangeFilter ? 5000 : PAGE_SIZE;
+        const isPendingFilter = filterStatus === "pending";
+        const requestPage = (hasExpiredRangeFilter || isPendingFilter) ? 1 : currentPage;
+        const requestPageSize = (hasExpiredRangeFilter || isPendingFilter) ? 5000 : PAGE_SIZE;
+        // The RPC has no "pending" status, so fetch everyone and filter by due amount client-side.
+        const requestStatus = isPendingFilter ? "all" : filterStatus;
 
         let result;
         try {
@@ -468,7 +471,7 @@ export default function MembersPage() {
             body: JSON.stringify({
               p_gym_id: selectedGym.id,
               p_search: debouncedSearch,
-              p_status: filterStatus,
+              p_status: requestStatus,
               p_page: requestPage,
               p_page_size: requestPageSize,
               p_user_id: user?.id || null,
@@ -484,7 +487,7 @@ export default function MembersPage() {
           const { data, error } = await supabase.rpc("get_members_paginated", {
             p_gym_id: selectedGym.id,
             p_search: debouncedSearch,
-            p_status: filterStatus,
+            p_status: requestStatus,
             p_page: requestPage,
             p_page_size: requestPageSize,
             p_user_id: user?.id || null,
@@ -500,7 +503,26 @@ export default function MembersPage() {
         if (result) {
           const transformedMembers = (result.members || []).map(transformMember);
 
-          if (hasExpiredRangeFilter) {
+          if (isPendingFilter) {
+            // Members with an outstanding balance (partial / pending payment).
+            const pendingMembers = transformedMembers.filter(
+              (member) => Number(member.dueAmount || 0) > 0
+            );
+
+            const filteredTotal = pendingMembers.length;
+            const calculatedPages = Math.max(1, Math.ceil(filteredTotal / PAGE_SIZE));
+
+            if (currentPage > calculatedPages) {
+              setCurrentPage(calculatedPages);
+              return;
+            }
+
+            const startIndex = (currentPage - 1) * PAGE_SIZE;
+            const endIndex = startIndex + PAGE_SIZE;
+            setMembers(pendingMembers.slice(startIndex, endIndex));
+            setTotalCount(filteredTotal);
+            setTotalPages(calculatedPages);
+          } else if (hasExpiredRangeFilter) {
             const fromTs = expiredStartDate
               ? new Date(`${expiredStartDate}T00:00:00`).getTime()
               : null;
@@ -1175,6 +1197,7 @@ Best regards,
     { id: "all", label: "All Members", count: stats.total },
     { id: "active", label: "Active", count: stats.active },
     { id: "expired", label: "Expired", count: stats.expired },
+    { id: "pending", label: "Pending", count: stats.dues },
     { id: "renewal", label: "Renewal", count: stats.renewal },
     { id: "inactive", label: "Inactive" },
   ];
