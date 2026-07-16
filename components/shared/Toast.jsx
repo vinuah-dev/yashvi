@@ -45,7 +45,7 @@ export default function Toast({ message, type = "success", isVisible, onClose })
   const styles = typeStyles[type] || typeStyles.success;
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+    <div className="fixed top-4 right-4 z-[200] animate-slide-in-right">
       <div
         className={`${styles.bg} ${styles.text} border-2 rounded-xl shadow-lg p-4 min-w-[300px] max-w-[400px] flex items-start gap-3`}
       >

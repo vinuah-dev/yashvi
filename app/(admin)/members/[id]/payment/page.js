@@ -180,7 +180,8 @@ export default function AddPaymentPage() {
       router.back();
     } catch (error) {
       console.error("Error recording payment:", error);
-      alert("Failed to record payment. Please try again.");
+      const reason = error?.message || (typeof error === "string" ? error : "");
+      alert(reason ? `Failed to record payment: ${reason}` : "Failed to record payment. Please try again.");
     } finally {
       setLoading(false);
     }

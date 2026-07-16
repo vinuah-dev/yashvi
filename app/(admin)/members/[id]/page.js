@@ -1032,12 +1032,12 @@ export default function MemberDetailPage() {
           </div>
         )}
 
-        {/* Quick Action Buttons */}
-        <div className={`grid ${(selectedGym?.plan === "Basic" || selectedGym?.plan_type === "Basic") ? "grid-cols-4" : "grid-cols-5"} gap-2`}>
+        {/* Quick Action Buttons — horizontal scroll so they never feel cramped */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1 snap-x">
           {!(selectedGym?.plan === "Basic" || selectedGym?.plan_type === "Basic") && (
             <button
               onClick={() => router.push(`/members/${member.id}/credentials`)}
-              className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
+              className="shrink-0 snap-start w-[84px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
             >
               <div className="w-10 h-10 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
                 <Key className="w-5 h-5 text-white" />
@@ -1048,7 +1048,7 @@ export default function MemberDetailPage() {
           
           <a
             href={`tel:${member.phone}`}
-            className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
+            className="shrink-0 snap-start w-[84px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
               <PhoneCall className="w-5 h-5 text-white" />
@@ -1060,7 +1060,7 @@ export default function MemberDetailPage() {
             href={`https://wa.me/91${member.phone}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
+            className="shrink-0 snap-start w-[84px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-white" />
@@ -1070,7 +1070,7 @@ export default function MemberDetailPage() {
           
           <button
             onClick={() => router.push(`/members/${member.id}/payment`)}
-            className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
+            className="shrink-0 snap-start w-[84px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-white" />
@@ -1094,7 +1094,7 @@ export default function MemberDetailPage() {
             }
           }}
       
-            className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
+            className="shrink-0 snap-start w-[84px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col items-center gap-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
             <div className="w-10 h-10 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
               <Star className="w-5 h-5 text-white" />
