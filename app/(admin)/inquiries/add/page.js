@@ -69,51 +69,48 @@ export default function AddInquiryPage() {
       const user = storedUser ? JSON.parse(storedUser) : null;
       const cleanPhone = formData.phone.replace(/\s|-/g, "");
 
-      // Check duplicate phone number within this gym
-      const { data: existing, error: checkError } = await supabase
-        .from("inquiries")
-        .select("id, full_name")
-        .eq("gym_id", selectedGym.id)
-        .eq("phone", cleanPhone)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error("Error checking duplicate:", checkError);
-      }
-
-      if (existing) {
-        setErrors({ phone: `This phone number already exists for inquiry: ${existing.full_name}` });
-        setLoading(false);
-        return;
-      }
-
-      const { error } = await supabase.from("inquiries").insert({
-        gym_id: selectedGym.id,
-        full_name: formData.full_name.trim(),
-        phone: cleanPhone,
-        visit_date: formData.visit_date,
-        follow_up_date: formData.follow_up_date || null,
-        interested_plan: formData.interested_plan || null,
-        status: formData.status,
-        notes: formData.notes.trim() || null,
-        created_by: user?.id || null,
+      // Save through the server API (service-role) so the insert works
+      // regardless of RLS state on the inquiries table.
+      const res = await fetch("/api/inquiries/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(user?.id || ""),
+        },
+        body: JSON.stringify({
+          inquiry: {
+            gym_id: selectedGym.id,
+            full_name: formData.full_name.trim(),
+            phone: cleanPhone,
+            visit_date: formData.visit_date,
+            follow_up_date: formData.follow_up_date || null,
+            interested_plan: formData.interested_plan || null,
+            status: formData.status,
+            notes: formData.notes.trim() || null,
+          },
+        }),
       });
 
-      if (error) {
-        if (error.code === "23505") {
-          setErrors({ phone: "A inquiry with this phone number already exists for this gym." });
-        } else {
-          throw error;
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409 && typeof json.error === "string" && json.error.startsWith("DUPLICATE_PHONE")) {
+          const existingName = json.error.split("DUPLICATE_PHONE:")[1]?.trim() || "";
+          setErrors({ phone: existingName ? `This phone number already exists for inquiry: ${existingName}` : "A inquiry with this phone number already exists for this gym." });
+          setLoading(false);
+          return;
         }
-        setLoading(false);
-        return;
+        throw new Error(json.error || "Failed to add inquiry");
       }
 
       alert("Inquiry added successfully!");
       router.push("/inquiries");
     } catch (error) {
       console.error("Error adding inquiry:", error);
-      alert("Failed to add inquiry. Please try again.");
+      const reason =
+        error?.message || error?.hint || error?.details ||
+        (typeof error === "string" ? error : "");
+      alert(reason ? `Failed to add inquiry: ${reason}` : "Failed to add inquiry. Please try again.");
     } finally {
       setLoading(false);
     }
