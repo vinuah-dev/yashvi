@@ -129,7 +129,7 @@ function DesktopNav({ role }) {
   }, []);
 
   return (
-    <header className="hidden md:block sticky top-0 z-40 border-b-[5px] border-black bg-white px-6 py-4 shadow-[0_8px_0_rgba(0,0,0,0.08)]">
+    <header className="hidden md:block sticky top-0 z-[90] border-b-[5px] border-black bg-white px-6 py-4 shadow-[0_8px_0_rgba(0,0,0,0.08)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
         <Link href={homePath} className="flex items-center gap-3">
           <img

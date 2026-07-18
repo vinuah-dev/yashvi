@@ -58,6 +58,9 @@ export default function TrainersPage() {
   const [payrollLoading, setPayrollLoading] = useState(false);
   const [exportingOverallTrainerExcel, setExportingOverallTrainerExcel] = useState(false);
   const [payrollData, setPayrollData] = useState({ summary: null, trainers: [] });
+  const [ptSharePercent, setPtSharePercent] = useState(50);
+  const [ptShareInput, setPtShareInput] = useState("50");
+  const [ptShareSaving, setPtShareSaving] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -118,6 +121,52 @@ export default function TrainersPage() {
     }
   }, [selectedGym?.id]);
 
+  const fetchPtShare = useCallback(async () => {
+    if (!selectedGym?.id) return;
+    try {
+      const res = await fetch("/api/settings/pt-split", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "get", p_gym_id: selectedGym.id }),
+      });
+      const json = await res.json();
+      const pct = Number(json?.data?.pt_trainer_share_percent);
+      if (Number.isFinite(pct)) {
+        setPtSharePercent(pct);
+        setPtShareInput(String(pct));
+      }
+    } catch {
+      // keep default 50
+    }
+  }, [selectedGym?.id]);
+
+  const savePtShare = async () => {
+    if (!selectedGym?.id) return;
+    let pct = Number(ptShareInput);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
+      alert("Enter a trainer share between 0 and 100.");
+      return;
+    }
+    setPtShareSaving(true);
+    try {
+      const res = await fetch("/api/settings/pt-split", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", p_gym_id: selectedGym.id, pt_trainer_share_percent: pct }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to save");
+      const saved = Number(json?.data?.pt_trainer_share_percent);
+      setPtSharePercent(saved);
+      setPtShareInput(String(saved));
+      fetchPayroll();
+    } catch (e) {
+      alert(`Failed to save PT split: ${e.message || e}`);
+    } finally {
+      setPtShareSaving(false);
+    }
+  };
+
   const fetchPayroll = useCallback(async () => {
     if (!selectedGym?.id) return;
 
@@ -161,7 +210,8 @@ export default function TrainersPage() {
     } else {
       setPayrollData({ summary: null, trainers: [] });
     }
-  }, [selectedGym?.id, canCreateTrainer, fetchTrainers, fetchPayroll]);
+    if (canCreateTrainer) fetchPtShare();
+  }, [selectedGym?.id, canCreateTrainer, fetchTrainers, fetchPayroll, fetchPtShare]);
 
   const handleDeleteTrainer = async (trainer) => {
     setDeleting(true);
@@ -553,6 +603,38 @@ export default function TrainersPage() {
                     onChange={(e) => setPayrollMonth(e.target.value)}
                     className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#f0813d]/20 focus:border-transparent"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* PT Revenue Split — configurable trainer share */}
+            <div className="rounded-xl border border-[#f0813d]/20 bg-[#f0813d]/5 p-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Personal Training Revenue Split</p>
+                  <p className="text-xs text-gray-500">
+                    Trainer keeps <span className="font-semibold text-[#9c4400]">{ptSharePercent}%</span>, gym keeps <span className="font-semibold text-[#9c4400]">{100 - ptSharePercent}%</span> of PT charges.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={ptShareInput}
+                      onChange={(e) => setPtShareInput(e.target.value)}
+                      className="w-24 pl-3 pr-7 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#f0813d]/20 focus:border-transparent"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                  </div>
+                  <button
+                    onClick={savePtShare}
+                    disabled={ptShareSaving || String(ptSharePercent) === ptShareInput}
+                    className="px-4 py-2 bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all"
+                  >
+                    {ptShareSaving ? "Saving..." : "Save"}
+                  </button>
                 </div>
               </div>
             </div>

@@ -17,12 +17,20 @@ export const POST = withApi(async (request, { supabase }) => {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // A trainer with no members assigned is not payable, so their salary is
-  // forced to zero here rather than relying on the attendance-based figure
-  // the RPC returns. The active-assignment count is read straight from
-  // trainer_member_assignments so this does not depend on the RPC exposing
-  // a member-count column.
   try {
+    // The RPC computes pt_charges at a fixed 50% trainer share. Re-scale it to
+    // the admin-configured share (pt_trainer_share_percent on the gym). We back
+    // out the full PT amount from the 50% figure, then apply the new percent.
+    const { data: gymRow } = await supabase
+      .from("gyms")
+      .select("pt_trainer_share_percent")
+      .eq("id", p_gym_id)
+      .maybeSingle();
+
+    const configuredPct = Number(gymRow?.pt_trainer_share_percent);
+    const sharePct = Number.isFinite(configuredPct) ? configuredPct : 50;
+
+    // A trainer with no active members isn't payable, so zero them out.
     const { data: assignments } = await supabase
       .from("trainer_member_assignments")
       .select("trainer_id")
@@ -40,17 +48,28 @@ export const POST = withApi(async (request, { supabase }) => {
       const assignedCount = countByTrainer.get(trainerKey) || 0;
       const hasNoMembers = assignedCount === 0;
 
+      // Back out full PT revenue from the RPC's 50% figure, then apply share.
+      const rpcPtCharges = Number(row.pt_charges || 0);
+      const fullPt = rpcPtCharges / 0.5; // RPC used 50%
+      const scaledPt = Math.round(fullPt * (sharePct / 100));
+
+      const salaryEarned = hasNoMembers ? 0 : Number(row.salary_earned || 0);
+      const ptCharges = hasNoMembers ? 0 : scaledPt;
+      const totalPayable = salaryEarned + ptCharges;
+
       return {
         ...row,
         assigned_members_count: assignedCount,
-        salary_earned: hasNoMembers ? 0 : Number(row.salary_earned || 0),
-        pt_charges: hasNoMembers ? 0 : Number(row.pt_charges || 0),
-        total_payable: hasNoMembers ? 0 : Number(row.total_payable || 0),
+        pt_share_percent: sharePct,
+        salary_earned: salaryEarned,
+        pt_charges: ptCharges,
+        total_payable: totalPayable,
       };
     });
 
     const summary = {
       ...(data?.summary || {}),
+      pt_share_percent: sharePct,
       total_salary_earned: trainers.reduce((s, t) => s + Number(t.salary_earned || 0), 0),
       total_pt_charges: trainers.reduce((s, t) => s + Number(t.pt_charges || 0), 0),
       total_payable: trainers.reduce((s, t) => s + Number(t.total_payable || 0), 0),
@@ -58,8 +77,6 @@ export const POST = withApi(async (request, { supabase }) => {
 
     return NextResponse.json({ data: { ...data, trainers, summary } });
   } catch {
-    // If the adjustment fails for any reason, fall back to the raw RPC result
-    // rather than breaking the payroll screen.
     return NextResponse.json({ data });
   }
 });

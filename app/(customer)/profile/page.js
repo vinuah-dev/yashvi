@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 import { supabase } from "@/lib/supabaseClient";
 import { clearSession } from "@/lib/sessionStorage";
 import { ProfilePageSkeleton } from "@/components/shared/CustomerSkeleton";
-import { Edit2, Camera, Calendar, AlertTriangle, DollarSign } from "lucide-react";
+import { Edit2, Camera, Calendar, AlertTriangle, DollarSign, Gift, Copy, Check } from "lucide-react";
 
 export default function CustomerProfilePage() {
   const router = useRouter();
@@ -17,6 +17,23 @@ export default function CustomerProfilePage() {
   const [payments, setPayments] = useState([]);
   const [gymInfo, setGymInfo] = useState(null);
   const [pendingPaymentInfo, setPendingPaymentInfo] = useState(null);
+  const [copiedReferral, setCopiedReferral] = useState(false);
+
+  // A member's referral code is their own member id — sharing it lets a new
+  // member enter it so this member gets referral points.
+  const referralCode = profile?.id ? String(profile.id) : "";
+
+  const handleCopyReferral = async () => {
+    if (!referralCode) return;
+    try {
+      await navigator.clipboard.writeText(referralCode);
+      setCopiedReferral(true);
+      setTimeout(() => setCopiedReferral(false), 2000);
+    } catch {
+      // Clipboard can fail on some mobile browsers; fall back to a select-all prompt.
+      window.prompt("Copy your referral code:", referralCode);
+    }
+  };
 
   useEffect(() => {
     fetchProfileData();
@@ -316,6 +333,33 @@ export default function CustomerProfilePage() {
             </span>
           </div>
         </div>
+
+        {/* Referral Code — share this so referrals credit you points */}
+        {referralCode && (
+          <div className="relative overflow-hidden rounded-3xl border border-[#f0813d]/25 bg-gradient-to-br from-[#2a211c] via-[#241e1a] to-[#1c1917] p-5 shadow-[0_18px_45px_rgba(0,0,0,0.36)]">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#f0813d]/15 border border-[#f0813d]/25">
+                <Gift className="w-4 h-4 text-[#f0813d]" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white leading-tight">Your Referral Code</p>
+                <p className="text-[11px] text-zinc-400">Share with friends to earn points</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                <p className="truncate text-base font-black tracking-wider text-[#f0813d]">{referralCode}</p>
+              </div>
+              <button
+                onClick={handleCopyReferral}
+                className="shrink-0 flex items-center gap-1.5 rounded-2xl bg-[#f0813d] px-4 py-3 text-sm font-bold text-white active:scale-95 transition-all"
+              >
+                {copiedReferral ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copiedReferral ? "Copied" : "Copy"}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-3">
           <div className="rounded-2xl border border-white/6 bg-[#2d2926] p-3 text-center shadow-lg">
