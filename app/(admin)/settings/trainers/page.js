@@ -51,7 +51,7 @@ export default function TrainersPage() {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const { selectedGym } = useAuthContext();
+  const { selectedGym, user: authUser } = useAuthContext();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [payrollMonth, setPayrollMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -126,7 +126,10 @@ export default function TrainersPage() {
     try {
       const res = await fetch("/api/settings/pt-split", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ action: "get", p_gym_id: selectedGym.id }),
       });
       const json = await res.json();
@@ -151,7 +154,10 @@ export default function TrainersPage() {
     try {
       const res = await fetch("/api/settings/pt-split", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ action: "update", p_gym_id: selectedGym.id, pt_trainer_share_percent: pct }),
       });
       const json = await res.json();
