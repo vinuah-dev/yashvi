@@ -44,6 +44,7 @@ import {
   ShieldAlert,
   Sparkles,
   Zap,
+  Fingerprint,
 } from "lucide-react";
 
 const settingsSections = [
@@ -118,6 +119,14 @@ const settingsSections = [
     description: "Locker, towel, parking & other amenities",
     icon: Package,
     href: "/settings/amenities",
+    color: "from-[#f0813d] to-[#9c4400]"
+  },
+  {
+    id: "biometric-devices",
+    title: "Biometric Devices",
+    description: "Register fingerprint scanners (eSSL F22) for this gym",
+    icon: Fingerprint,
+    href: "/settings/biometric-devices",
     color: "from-[#f0813d] to-[#9c4400]"
   },
 ];
