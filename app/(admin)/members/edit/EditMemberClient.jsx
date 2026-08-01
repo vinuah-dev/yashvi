@@ -20,6 +20,7 @@ export default function EditMemberClient() {
     name: "",
     phone: "",
     email: "",
+    biometricUid: "",
     selfPlanEditAccess: false,
   });
 
@@ -51,6 +52,7 @@ export default function EditMemberClient() {
           name: data.full_name || "",
           phone: data.phone || "",
           email: data.email || "",
+          biometricUid: data.biometric_uid || "",
           selfPlanEditAccess: data.self_plan_edit_access || false,
         });
         setProfileImage(data.profile_image || null);
@@ -82,6 +84,7 @@ export default function EditMemberClient() {
           full_name: formData.name,
           phone: formData.phone,
           email: formData.email || null,
+          biometric_uid: formData.biometricUid.trim() || null,
           self_plan_edit_access: formData.selfPlanEditAccess,
         })
         .eq("id", memberId);
@@ -199,6 +202,22 @@ export default function EditMemberClient() {
               onChange={(e) => updateForm("email", e.target.value.toLowerCase().trim())}
               title="Please enter a valid email address"
             />
+          </div>
+
+          {/* Biometric UID (eSSL F22 User ID) */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
+              Biometric UID
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              className="w-full px-4 py-3.5 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F97316] focus:border-[#F97316] outline-none transition-all duration-200 text-gray-900 placeholder-gray-400 bg-white"
+              value={formData.biometricUid}
+              onChange={(e) => updateForm("biometricUid", e.target.value.replace(/\s/g, ""))}
+              placeholder="F22 User ID (e.g. 101)"
+            />
+            <p className="text-xs text-gray-500 mt-1">User ID assigned to this member's fingerprint on the F22 device</p>
           </div>
 
           {/* Self Plan Edit Access Toggle */}

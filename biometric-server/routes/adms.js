@@ -88,36 +88,21 @@ async function getGymFromDeviceSN(deviceSN, logger) {
  */
 async function getMemberInfo(gymId, fingerprintId, logger) {
   try {
-    // Step 1: Map the machine User ID to an existing member without changing members table.
-    const { data: mapping, error: mappingError } = await supabase
-      .from('biometric_member_map')
-      .select('member_id')
-      .eq('gym_id', gymId)
-      .eq('fingerprint_id', fingerprintId)
-      .single();
-    
-    if (mappingError || !mapping) {
-      logger.info({
-        msg: 'Member not found in biometric_member_map',
-        gymId,
-        fingerprintId
-      });
-      return { member_id: null, membership_status: 'UNKNOWN_MEMBER', member_name: null };
-    }
-
+    // Simplified flow: the F22 User ID (fingerprintId) is stored directly on the
+    // member as members.biometric_uid. Look the member up by that UID + gym.
+    // (No biometric_member_map indirection.)
     const { data: member, error: memberError } = await supabase
       .from('members')
       .select('id, full_name')
-      .eq('id', mapping.member_id)
       .eq('gym_id', gymId)
+      .eq('biometric_uid', String(fingerprintId))
       .single();
 
     if (memberError || !member) {
-      logger.warn({
-        msg: 'Biometric mapping points to missing member',
+      logger.info({
+        msg: 'No member found with this biometric_uid',
         gymId,
-        fingerprintId,
-        memberId: mapping.member_id
+        biometric_uid: fingerprintId
       });
       return { member_id: null, membership_status: 'UNKNOWN_MEMBER', member_name: null };
     }
