@@ -204,10 +204,10 @@ export default function EditMemberClient() {
             />
           </div>
 
-          {/* Biometric UID (eSSL F22 User ID) */}
+          {/* Biometric User ID (eSSL F22 User ID) */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-2">
-              Biometric UID
+              Biometric User ID
             </label>
             <input
               type="text"
@@ -217,7 +217,7 @@ export default function EditMemberClient() {
               onChange={(e) => updateForm("biometricUid", e.target.value.replace(/\s/g, ""))}
               placeholder="F22 User ID (e.g. 101)"
             />
-            <p className="text-xs text-gray-500 mt-1">User ID assigned to this member's fingerprint on the F22 device</p>
+            <p className="text-xs text-gray-500 mt-1">The User ID shown on the F22 device for this member's fingerprint</p>
           </div>
 
           {/* Self Plan Edit Access Toggle */}

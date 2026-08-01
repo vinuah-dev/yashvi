@@ -798,10 +798,10 @@ export default function AddMemberPage() {
                   <p className="mt-2 text-[10px] font-black uppercase tracking-wide text-gray-400">Optional - for app login</p>
                 </div>
 
-                {/* Biometric UID (eSSL F22 User ID) */}
+                {/* Biometric User ID (eSSL F22 User ID) */}
                 <div className="rounded-2xl border border-orange-100 bg-gradient-to-br from-white via-orange-50/70 to-white p-4 shadow-sm">
                   <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.16em] text-gray-950">
-                    Biometric UID
+                    Biometric User ID
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl bg-[#1a1c1c] text-white">
@@ -816,7 +816,7 @@ export default function AddMemberPage() {
                       onChange={(e) => updateForm("biometricUid", e.target.value.replace(/\s/g, ""))}
                     />
                   </div>
-                  <p className="mt-2 text-[10px] font-black uppercase tracking-wide text-gray-400">Optional - User ID from the F22 fingerprint device</p>
+                  <p className="mt-2 text-[10px] font-black uppercase tracking-wide text-gray-400">Optional - the User ID shown on the F22 fingerprint device</p>
                 </div>
 
                 {/* Gender and Age */}
