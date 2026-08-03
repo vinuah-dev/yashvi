@@ -350,7 +350,7 @@ export default async function admsRoutes(fastify, options) {
    * 4. Save attendance with gym_id attached
    * 5. ALWAYS return 200 OK (never block device)
    */
-  fastify.post('/cdata', async (request, reply) => {
+  fastify.post(['/cdata', '/cdata.aspx'], async (request, reply) => {
     const startTime = Date.now();
     
     try {
@@ -479,7 +479,7 @@ export default async function admsRoutes(fastify, options) {
    * GET /iclock/cdata
    * Some devices use GET for handshake/initialization
    */
-  fastify.get('/cdata', async (request, reply) => {
+  fastify.get(['/cdata', '/cdata.aspx'], async (request, reply) => {
     const { query } = request;
     const deviceSN = getDeviceSN(query);
     
@@ -516,7 +516,7 @@ export default async function admsRoutes(fastify, options) {
    * Device polls this URL to check for pending commands
    * MULTI-GYM: Filters commands by gym_id to prevent cross-gym leakage
    */
-  fastify.get('/getrequest', async (request, reply) => {
+  fastify.get(['/getrequest', '/getrequest.aspx'], async (request, reply) => {
     try {
       const { query } = request;
       const deviceSN = getDeviceSN(query);
@@ -589,7 +589,7 @@ export default async function admsRoutes(fastify, options) {
    * POST /iclock/devicecmd
    * Device confirms it finished executing a command
    */
-  fastify.post('/devicecmd', async (request, reply) => {
+  fastify.post(['/devicecmd', '/devicecmd.aspx'], async (request, reply) => {
     try {
       const { query, body } = request;
       const deviceSN = getDeviceSN(query);
