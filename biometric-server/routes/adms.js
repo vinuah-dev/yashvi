@@ -350,7 +350,7 @@ export default async function admsRoutes(fastify, options) {
    * 4. Save attendance with gym_id attached
    * 5. ALWAYS return 200 OK (never block device)
    */
-  const cdataHandler = async (request, reply) => {
+  const handleCdataPost = async (request, reply) => {
     const startTime = Date.now();
     
     try {
@@ -474,14 +474,12 @@ export default async function admsRoutes(fastify, options) {
       return reply.code(200).send('OK');
     }
   };
-  fastify.post('/cdata', cdataHandler);
-  fastify.post('/cdata.aspx', cdataHandler);
   
   /**
    * GET /iclock/cdata
    * Some devices use GET for handshake/initialization
    */
-  const cdataGetHandler = async (request, reply) => {
+  const handleCdataGet = async (request, reply) => {
     const { query } = request;
     const deviceSN = getDeviceSN(query);
     
@@ -512,15 +510,13 @@ export default async function admsRoutes(fastify, options) {
     
     return reply.code(200).send(response);
   };
-  fastify.get('/cdata', cdataGetHandler);
-  fastify.get('/cdata.aspx', cdataGetHandler);
   
   /**
    * GET /iclock/getrequest
    * Device polls this URL to check for pending commands
    * MULTI-GYM: Filters commands by gym_id to prevent cross-gym leakage
    */
-  const getRequestHandler = async (request, reply) => {
+  const handleGetrequest = async (request, reply) => {
     try {
       const { query } = request;
       const deviceSN = getDeviceSN(query);
@@ -588,14 +584,12 @@ export default async function admsRoutes(fastify, options) {
       return reply.code(200).send('OK');
     }
   };
-  fastify.get('/getrequest', getRequestHandler);
-  fastify.get('/getrequest.aspx', getRequestHandler);
   
   /**
    * POST /iclock/devicecmd
    * Device confirms it finished executing a command
    */
-  const deviceCmdHandler = async (request, reply) => {
+  const handleDevicecmd = async (request, reply) => {
     try {
       const { query, body } = request;
       const deviceSN = getDeviceSN(query);
@@ -642,20 +636,27 @@ export default async function admsRoutes(fastify, options) {
       return reply.code(200).send('OK');
     }
   };
-  fastify.post('/devicecmd', deviceCmdHandler);
-  fastify.post('/devicecmd.aspx', deviceCmdHandler);
   
   /**
    * GET /iclock/ping
    * Device heartbeat/keep-alive
    */
-  const pingHandler = async (request, reply) => {
+  // Some eSSL firmwares (e.g. Ver 8.0.4.3) append .aspx to every iclock URL,
+  // so each endpoint is registered on both the plain and .aspx path.
+  fastify.post('/cdata', handleCdataPost);
+  fastify.post('/cdata.aspx', handleCdataPost);
+  fastify.get('/cdata', handleCdataGet);
+  fastify.get('/cdata.aspx', handleCdataGet);
+  fastify.get('/getrequest', handleGetrequest);
+  fastify.get('/getrequest.aspx', handleGetrequest);
+  fastify.post('/devicecmd', handleDevicecmd);
+  fastify.post('/devicecmd.aspx', handleDevicecmd);
+
+  fastify.get('/ping', async (request, reply) => {
     const deviceSN = getDeviceSN(request.query);
     fastify.log.debug({ msg: 'Device ping', deviceSN });
     return reply.code(200).send('OK');
-  };
-  fastify.get('/ping', pingHandler);
-  fastify.get('/ping.aspx', pingHandler);
+  });
   
   /**
    * Catch-all for other iclock endpoints
