@@ -386,6 +386,19 @@ export default async function admsRoutes(fastify, options) {
       // ============================================
       // STEP 2: Parse attendance records
       // ============================================
+      // The device posts several log types to this same endpoint
+      // (ATTLOG = punches, OPERLOG = device operations, etc).
+      // Only ATTLOG rows are attendance; ignore the rest.
+      const tableType = String(query?.table || query?.TABLE || '').toUpperCase();
+      if (tableType && tableType !== 'ATTLOG') {
+        fastify.log.info({
+          msg: 'Ignoring non-attendance table push',
+          deviceSN,
+          table: tableType
+        });
+        return reply.code(200).send('OK');
+      }
+
       const records = parseAttendanceData(body, query);
       
       if (records.length === 0) {
@@ -407,15 +420,13 @@ export default async function admsRoutes(fastify, options) {
         );
         
         const recordTimestamp = new Date(record.timestamp).toISOString();
-        const recordDate = recordTimestamp.split('T')[0]; // Extract YYYY-MM-DD
-        
+
         dbRecords.push({
           gym_id: gym_id,                    // From device lookup
           user_id: record.user_id,           // Fingerprint PIN
           device_sn: deviceSN,
           member_id: member_id,              // Linked member UUID (nullable)
-          attendance_date: recordDate,       // Date only (YYYY-MM-DD)
-          timestamp: recordTimestamp,
+          timestamp: recordTimestamp,        // Full timestamp (date is derived from this)
           status: record.status,
           membership_status: membership_status,  // ACTIVE, EXPIRED, etc.
           raw_data: {
