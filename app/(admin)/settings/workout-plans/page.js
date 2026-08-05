@@ -63,6 +63,8 @@ function WorkoutPlansContent() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [gymId, setGymId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  // "general" = gym-wide/template plans, "personal" = plans built for one member
+  const [planScope, setPlanScope] = useState("general");
 
   useEffect(() => {
     fetchWorkoutPlans();
@@ -116,15 +118,17 @@ function WorkoutPlansContent() {
       const gym = JSON.parse(storedGym);
       setGymId(gym.id);
 
-      // Fetch general workout plans with creator info (not member-specific)
+      // Fetch every plan for this gym. Member-specific ("personal") plans used
+      // to be filtered out entirely, which is why admins and trainers could
+      // never see what had been built for an individual member.
       const { data, error } = await supabase
         .from("workout_plans")
         .select(`
           *,
-          creator:created_by(id, role, first_name, last_name)
+          creator:created_by(id, role, first_name, last_name),
+          assignedMember:member_id(id, full_name)
         `)
         .eq("gym_id", gym.id)
-        .is("member_id", null)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -133,7 +137,8 @@ function WorkoutPlansContent() {
       const plansWithCreator = (data || []).map(plan => ({
         ...plan,
         creatorName: plan.created_by_name || 
-          (plan.creator ? `${plan.creator.first_name || ''} ${plan.creator.last_name || ''}`.trim() : null)
+          (plan.creator ? `${plan.creator.first_name || ''} ${plan.creator.last_name || ''}`.trim() : null),
+        memberName: plan.assignedMember?.full_name || null
       }));
       
       // Include all plans (admin can see trainer-created plans)
@@ -146,10 +151,17 @@ function WorkoutPlansContent() {
     }
   };
 
-  const filteredPlans = workoutPlans.filter(plan =>
-    plan.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.goal?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.level?.toLowerCase().includes(searchQuery.toLowerCase())
+  const generalPlans = workoutPlans.filter(plan => !plan.member_id);
+  const personalPlans = workoutPlans.filter(plan => plan.member_id);
+
+  const scopedPlans = planScope === "personal" ? personalPlans : generalPlans;
+
+  const query = searchQuery.toLowerCase();
+  const filteredPlans = scopedPlans.filter(plan =>
+    plan.title?.toLowerCase().includes(query) ||
+    plan.goal?.toLowerCase().includes(query) ||
+    plan.level?.toLowerCase().includes(query) ||
+    plan.memberName?.toLowerCase().includes(query)
   );
 
   const handleDelete = async (id) => {
@@ -209,8 +221,10 @@ function WorkoutPlansContent() {
           <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-500 font-medium">Total Plans</p>
-                <p className="text-xl font-bold text-gray-900 mt-0.5">{workoutPlans.length}</p>
+                <p className="text-xs text-gray-500 font-medium">
+                  {planScope === "personal" ? "Personal Plans" : "General Plans"}
+                </p>
+                <p className="text-xl font-bold text-gray-900 mt-0.5">{scopedPlans.length}</p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-[#f0813d]/10 to-[#f0813d]/15 rounded-lg flex items-center justify-center">
                 <Dumbbell className="w-5 h-5 text-white" />
@@ -223,7 +237,7 @@ function WorkoutPlansContent() {
               <div>
                 <p className="text-xs text-gray-500 font-medium">Beginner</p>
                 <p className="text-xl font-bold text-[#f0813d] mt-0.5">
-                  {workoutPlans.filter(p => p.level?.toLowerCase() === "beginner").length}
+                  {scopedPlans.filter(p => p.level?.toLowerCase() === "beginner").length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-[#f0813d]/10 to-[#f0813d]/15 rounded-lg flex items-center justify-center">
@@ -237,7 +251,7 @@ function WorkoutPlansContent() {
               <div>
                 <p className="text-xs text-gray-500 font-medium">Intermediate</p>
                 <p className="text-xl font-bold text-[#f0813d] mt-0.5">
-                  {workoutPlans.filter(p => p.level?.toLowerCase() === "intermediate").length}
+                  {scopedPlans.filter(p => p.level?.toLowerCase() === "intermediate").length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-[#f0813d]/10 to-[#f0813d]/15 rounded-lg flex items-center justify-center">
@@ -251,7 +265,7 @@ function WorkoutPlansContent() {
               <div>
                 <p className="text-xs text-gray-500 font-medium">Advanced</p>
                 <p className="text-xl font-bold text-[#f0813d] mt-0.5">
-                  {workoutPlans.filter(p => p.level?.toLowerCase() === "advanced").length}
+                  {scopedPlans.filter(p => p.level?.toLowerCase() === "advanced").length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-br from-[#f0813d]/10 to-[#f0813d]/15 rounded-lg flex items-center justify-center">
@@ -263,6 +277,33 @@ function WorkoutPlansContent() {
 
         {/* Search and Add Plan */}
         <div className="bg-white rounded-xl p-3 mx-1 space-y-3">
+          {/* General vs Personal scope */}
+          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+            {[
+              { key: "general", label: "General", count: generalPlans.length },
+              { key: "personal", label: "Personal", count: personalPlans.length },
+            ].map((scope) => (
+              <button
+                key={scope.key}
+                type="button"
+                onClick={() => setPlanScope(scope.key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  planScope === scope.key
+                    ? "bg-[#f0813d] text-white shadow-sm"
+                    : "text-gray-500"
+                }`}
+                style={{ minHeight: '38px' }}
+              >
+                {scope.label}
+                <span className={`px-1.5 rounded-full text-xs ${
+                  planScope === scope.key ? "bg-white/25" : "bg-gray-200 text-gray-600"
+                }`}>
+                  {scope.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
           {/* Search Bar */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -298,10 +339,18 @@ function WorkoutPlansContent() {
                 <Dumbbell className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-base font-semibold text-gray-900 mb-2">
-                {searchQuery ? "No plans found" : "No workout plans yet"}
+                {searchQuery
+                  ? "No plans found"
+                  : planScope === "personal"
+                    ? "No personal plans yet"
+                    : "No workout plans yet"}
               </h3>
               <p className="text-gray-500 text-sm mb-6">
-                {searchQuery ? "Try adjusting your search" : "Create your first workout plan to get started"}
+                {searchQuery
+                  ? "Try adjusting your search"
+                  : planScope === "personal"
+                    ? "Personal plans appear here once you build one from a member's profile"
+                    : "Create your first workout plan to get started"}
               </p>
               {searchQuery && (
                 <button
@@ -335,6 +384,14 @@ function WorkoutPlansContent() {
                           <h3 className="font-semibold text-gray-900 text-base truncate">
                             {plan.title}
                           </h3>
+                          {plan.memberName && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <User className="w-3 h-3 text-[#f0813d]" />
+                              <span className="text-[#9c4400] text-xs font-semibold truncate">
+                                Personal plan for {plan.memberName}
+                              </span>
+                            </div>
+                          )}
                           {plan.goal && (
                             <div className="flex items-center gap-1 mt-1">
                               <Target className="w-3 h-3 text-gray-400" />

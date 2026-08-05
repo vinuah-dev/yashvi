@@ -45,6 +45,7 @@ import {
   Sparkles,
   Zap,
   Fingerprint,
+  Trophy,
 } from "lucide-react";
 
 const settingsSections = [
@@ -119,6 +120,14 @@ const settingsSections = [
     description: "Locker, towel, parking & other amenities",
     icon: Package,
     href: "/settings/amenities",
+    color: "from-[#f0813d] to-[#9c4400]"
+  },
+  {
+    id: "leaderboard",
+    title: "Leaderboard & Challenges",
+    description: "Streak leaderboard, create challenges & manage scores",
+    icon: Trophy,
+    href: "/admin/leaderboard",
     color: "from-[#f0813d] to-[#9c4400]"
   },
   {

@@ -48,6 +48,7 @@ export default function CustomerDashboard() {
   const [announcements, setAnnouncements] = useState([]);
   const [dashboardData, setDashboardData] = useState({
     name: "Member",
+    profileImage: null,
     gymName: "Gym",
     gymLogo: null,
     membership: {
@@ -82,6 +83,7 @@ export default function CustomerDashboard() {
         .select(`
           id,
           full_name,
+          profile_image,
           gym_id,
           balance,
           memberships (
@@ -290,6 +292,7 @@ export default function CustomerDashboard() {
 
       setDashboardData({
         name: memberDetails.full_name?.split(" ")[0] || "Member",
+        profileImage: memberDetails.profile_image || null,
         gymName: gymData?.name || "Gym",
         gymLogo: gymData?.logo_url || null,
         membership: {
@@ -429,9 +432,18 @@ export default function CustomerDashboard() {
               className="cursor-pointer w-11 h-11 rounded-xl bg-gradient-to-br from-[#f0813d] to-[#9c4400] p-[2px] shadow-lg active-scale hover:rotate-3 transition-transform"
             >
               <div className="w-full h-full rounded-[10px] bg-zinc-950 flex items-center justify-center overflow-hidden">
-                <span className="text-sm font-black font-heading text-white">
-                  {dashboardData.name[0]?.toUpperCase()}
-                </span>
+                {dashboardData.profileImage ? (
+                  <img
+                    src={dashboardData.profileImage}
+                    alt={dashboardData.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  />
+                ) : (
+                  <span className="text-sm font-black font-heading text-white">
+                    {dashboardData.name[0]?.toUpperCase()}
+                  </span>
+                )}
               </div>
             </div>
           </div>

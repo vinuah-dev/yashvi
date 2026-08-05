@@ -149,6 +149,140 @@ async function getMemberInfo(gymId, fingerprintId, logger) {
 }
 
 /**
+ * Get trainer info by biometric UID.
+ * Trainers punch on the same device as members. Their F22 User ID lives on
+ * profiles.biometric_uid, and gym_trainers links that profile to this gym.
+ *
+ * Only called when a punch did NOT match any member, so member behaviour
+ * is completely unchanged.
+ *
+ * @param {string} gymId - Gym UUID (from device SN)
+ * @param {string} fingerprintId - PIN / User ID from the device
+ * @param {object} logger - Fastify logger
+ * @returns {Promise<{trainer_id: string|null, trainer_name: string|null}>}
+ */
+async function getTrainerInfo(gymId, fingerprintId, logger) {
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .eq('biometric_uid', String(fingerprintId))
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      return { trainer_id: null, trainer_name: null };
+    }
+
+    // Confirm this profile is actually a trainer at THIS gym.
+    // Without this check a trainer from gym A could punch on gym B's device.
+    const { data: link, error: linkError } = await supabase
+      .from('gym_trainers')
+      .select('id')
+      .eq('gym_id', gymId)
+      .eq('profile_id', profile.id)
+      .maybeSingle();
+
+    if (linkError || !link) {
+      logger.warn({
+        msg: 'Biometric UID belongs to a profile that is not a trainer of this gym',
+        gymId,
+        biometric_uid: fingerprintId
+      });
+      return { trainer_id: null, trainer_name: null };
+    }
+
+    const name = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    return { trainer_id: profile.id, trainer_name: name || 'Trainer' };
+
+  } catch (err) {
+    logger.error({ msg: 'Exception in getTrainerInfo', error: err.message });
+    return { trainer_id: null, trainer_name: null };
+  }
+}
+
+/**
+ * Write a trainer punch into the `trainer_attendance` table.
+ *
+ * Rule (as requested):
+ *   - FIRST punch of the day  -> that is the trainer's LOGIN  (check_in_time)
+ *   - EVERY later punch       -> overwrites the LOGOUT        (check_out_time)
+ *
+ * So the last punch of the day always ends up as the logout time, and the
+ * value keeps moving forward as the trainer punches again. Session 1 is used
+ * for the whole day so a single row holds first-in / last-out.
+ */
+async function updateTrainerAttendance({ gym_id, trainer_id, timestamp }, logger) {
+  if (!trainer_id) return;
+
+  try {
+    const dt = new Date(timestamp);
+    const dateStr = dt.toISOString().split('T')[0];
+    const timeStr = dt.toTimeString().split(' ')[0]; // HH:MM:SS local
+
+    const { data: existing, error: fetchErr } = await supabase
+      .from('trainer_attendance')
+      .select('id, check_in_time, check_out_time')
+      .eq('gym_id', gym_id)
+      .eq('trainer_id', trainer_id)
+      .eq('attendance_date', dateStr)
+      .eq('session_number', 1)
+      .maybeSingle();
+
+    if (fetchErr) {
+      logger.error({ msg: 'Trainer attendance fetch error', error: fetchErr });
+      return;
+    }
+
+    if (!existing) {
+      // First punch today = login. No logout yet.
+      const { error: insertErr } = await supabase
+        .from('trainer_attendance')
+        .insert({
+          gym_id,
+          trainer_id,
+          attendance_date: dateStr,
+          session_number: 1,
+          check_in_time: timeStr,
+          notes: 'Biometric punch',
+        });
+
+      if (insertErr) {
+        logger.error({ msg: 'Trainer attendance insert error', error: insertErr });
+      } else {
+        logger.info({ msg: '✅ Trainer LOGIN recorded', trainer_id, time: timeStr });
+      }
+      return;
+    }
+
+    // Already checked in today — this punch becomes the (new) logout time.
+    // Guard against a clock/ordering glitch pushing logout before login.
+    if (existing.check_in_time && timeStr < existing.check_in_time) {
+      const { error: earlyErr } = await supabase
+        .from('trainer_attendance')
+        .update({ check_in_time: timeStr })
+        .eq('id', existing.id);
+
+      if (earlyErr) logger.error({ msg: 'Trainer earlier check-in update error', error: earlyErr });
+      return;
+    }
+
+    const { error: updErr } = await supabase
+      .from('trainer_attendance')
+      .update({ check_out_time: timeStr })
+      .eq('id', existing.id);
+
+    if (updErr) {
+      logger.error({ msg: 'Trainer attendance checkout update error', error: updErr });
+    } else {
+      logger.info({ msg: '🔁 Trainer LOGOUT moved forward', trainer_id, time: timeStr });
+    }
+
+  } catch (e) {
+    logger.error({ msg: 'Exception in updateTrainerAttendance', error: e.message });
+  }
+}
+
+/**
  * Parse ADMS attendance data from various formats
  * eSSL devices can send data in multiple formats
  */
@@ -421,6 +555,18 @@ export default async function admsRoutes(fastify, options) {
         
         const recordTimestamp = new Date(record.timestamp).toISOString();
 
+        // If the UID did not match a member, it may belong to a trainer.
+        // Members are always checked first, so member behaviour is unchanged.
+        let trainer_id = null;
+        let trainer_name = null;
+        if (!member_id) {
+          ({ trainer_id, trainer_name } = await getTrainerInfo(
+            gym_id,
+            record.user_id,
+            fastify.log
+          ));
+        }
+
         dbRecords.push({
           gym_id: gym_id,                    // From device lookup
           user_id: record.user_id,           // Fingerprint PIN
@@ -428,14 +574,17 @@ export default async function admsRoutes(fastify, options) {
           member_id: member_id,              // Linked member UUID (nullable)
           timestamp: recordTimestamp,        // Full timestamp (date is derived from this)
           status: record.status,
-          membership_status: membership_status,  // ACTIVE, EXPIRED, etc.
+          membership_status: trainer_id ? 'TRAINER' : membership_status,
           raw_data: {
             verify_type: record.verify_type,
             work_code: record.work_code,
             original_query: query,
             received_at: new Date().toISOString(),
             device_id: device_id,
-            member_name: member_name || null
+            member_name: member_name || null,
+            trainer_id: trainer_id || null,
+            trainer_name: trainer_name || null,
+            punch_type: member_id ? 'MEMBER' : (trainer_id ? 'TRAINER' : 'UNKNOWN')
           }
         });
       }
@@ -480,11 +629,23 @@ export default async function admsRoutes(fastify, options) {
         // punches (biometric_uid not linked to any member) are kept in the raw
         // log only. Skipping them here avoids a NOT NULL violation.
         if (!r.member_id) {
+          const trainerId = r.raw_data?.trainer_id;
+
+          if (trainerId) {
+            // Trainer punch — first punch = login, every later punch = logout
+            await updateTrainerAttendance({
+              gym_id: r.gym_id,
+              trainer_id: trainerId,
+              timestamp: r.timestamp,
+            }, fastify.log);
+            continue;
+          }
+
           fastify.log.warn({
-            msg: 'Punch not linked to any member — raw log only',
+            msg: 'Punch not linked to any member or trainer — raw log only',
             user_id: r.user_id,
             device_sn: r.device_sn,
-            hint: 'Set this User ID as the member\'s Biometric User ID in the app'
+            hint: 'Set this User ID as the member\'s Biometric User ID, or the trainer\'s Biometric User ID in the app'
           });
           continue;
         }

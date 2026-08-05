@@ -77,6 +77,7 @@ export default function AttendancePage() {
           check_in_date,
           check_in_time,
           check_out_time,
+          count,
           membership_status,
           members (
             id,
@@ -169,6 +170,7 @@ export default function AttendancePage() {
           })
         : null,
       status: record.check_out_time ? "checked-out" : "checked-in",
+      count: record.count || 1,
       membershipStatus: record.membership_status || "ACTIVE",
     }));
   }, [rawAttendance]);
@@ -596,10 +598,8 @@ export default function AttendancePage() {
               </div>
             ) : (
               <>
-  <div className="hidden md:grid grid-cols-5 gap-4 px-6 py-4 bg-[#ebe5e1] rounded-2xl mx-1 text-xs font-black uppercase tracking-[0.15em] text-[#6e625c]">
+  <div className="hidden md:grid grid-cols-3 gap-4 px-6 py-4 bg-[#ebe5e1] rounded-2xl mx-1 text-xs font-black uppercase tracking-[0.15em] text-[#6e625c]">
     <div>Member</div>
-    <div>Check In</div>
-    <div>Check Out</div>
     <div>Status</div>
     <div>Actions</div>
   </div>
@@ -637,47 +637,24 @@ export default function AttendancePage() {
                               <span className="font-medium">Membership expired - Requires renewal</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-3 mt-1">
-                            <div className="flex items-center gap-1 text-xs text-[#f0813d]">
+                          {/* Members only need a presence mark, not in/out times */}
+                          {record.count > 1 && (
+                            <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
                               <Clock className="w-3 h-3" />
-                              <span>In: {record.checkIn}</span>
-                            </div>
-                            {record.checkOut && (
-                              <div className="flex items-center gap-1 text-xs text-[#f0813d]">
-                                <Clock className="w-3 h-3" />
-                                <span>Out: {record.checkOut}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          {record.status === "checked-in" ? (
-                            <div className="px-2.5 py-1.5 rounded-lg border bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 text-[#f0813d] flex items-center gap-1.5">
-                              <CheckCircle className="w-3.5 h-3.5" />
-                              <span className="text-xs font-medium">Active</span>
-                            </div>
-                          ) : (
-                            <div className="px-2.5 py-1.5 rounded-lg border bg-gradient-to-br from-orange-50 to-orange-100 border-[#f0813d]/20 text-[#f0813d] flex items-center gap-1.5">
-                              <CheckCircle className="w-3.5 h-3.5" />
-                              <span className="text-xs font-medium">Completed</span>
+                              <span>{record.count} entries today</span>
                             </div>
                           )}
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="px-2.5 py-1.5 rounded-lg border bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 text-[#f0813d] flex items-center gap-1.5">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span className="text-xs font-medium">Present</span>
+                          </div>
                         </div>
                       </div>
 
                       {/* Action Buttons */}
                       <div className="flex space-x-2 overflow-x-auto mt-3 pt-3 border-t border-gray-100 pb-1 -mx-1 px-1 no-scrollbar">
-                        {record.status === "checked-in" && (
-                          <button
-                            onClick={() => handleCheckOut(record.id, record.memberId)}
-                            className="flex-shrink-0 px-3 py-2 bg-gradient-to-r from-[#f0813d] to-[#f0813d] text-white text-xs font-medium rounded-lg active:scale-95 transition-all flex items-center gap-2"
-                            style={{ minHeight: '36px' }}
-                          >
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            Check Out
-                          </button>
-                        )}
-                        
                         <button
                           onClick={() => router.push(`/members/${record.memberId}`)}
                           className="flex-shrink-0 px-3 py-2 bg-[#f0813d]/10 text-[#f0813d] cursor-pointer text-xs font-medium rounded-lg active:bg-orange-100 transition-all flex items-center gap-2"

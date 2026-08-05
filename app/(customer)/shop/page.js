@@ -164,8 +164,18 @@ export default function CustomerShopPage() {
                 const inCart = cart[item.id] || 0;
                 return (
                   <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="h-28 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-                      <Package className="w-10 h-10 text-gray-300" />
+                    <div className="h-28 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      ) : (
+                        <Package className="w-10 h-10 text-gray-300" />
+                      )}
                     </div>
                     <div className="p-3">
                       <h3 className="font-bold text-gray-900 text-sm truncate">{item.name}</h3>
@@ -198,9 +208,9 @@ export default function CustomerShopPage() {
           {orderSuccess ? (
             <div className="flex flex-col items-center py-10">
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4"><CheckCircle className="w-8 h-8 text-[#f0813d]" /></div>
-              <h3 className="font-bold text-white text-lg mb-1">Order Placed!</h3>
-              <p className="text-white text-sm mb-4">Total: ₹{orderSuccess.final_amount}</p>
-              {orderSuccess.points_used > 0 && <p className="text-white text-sm font-medium">-{orderSuccess.points_used} points used (₹{orderSuccess.points_discount} off)</p>}
+              <h3 className="font-bold text-gray-900 text-lg mb-1">Order Placed!</h3>
+              <p className="text-gray-600 text-sm mb-4">Total: ₹{orderSuccess.final_amount}</p>
+              {orderSuccess.points_used > 0 && <p className="text-[#f0813d] text-sm font-medium">-{orderSuccess.points_used} points used (₹{orderSuccess.points_discount} off)</p>}
               <button onClick={() => { setTab("shop"); setOrderSuccess(null); }} className="mt-4 px-6 py-2.5 bg-[#f0813d] text-white rounded-xl text-sm font-semibold">Continue Shopping</button>
             </div>
           ) : cartItems.length === 0 ? (
@@ -210,10 +220,22 @@ export default function CustomerShopPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-50">
               {cartItems.map(item => (
                 <div key={item.id} className="flex items-center gap-3 px-4 py-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0"><Package className="w-5 h-5 text-gray-400" /></div>
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                    ) : (
+                      <Package className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-white truncate">{item.name}</p>
-                    <p className="text-xs text-white">₹{item.price} × {item.qty}</p>
+                    <p className="font-semibold text-sm text-gray-900 truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500">₹{item.price} × {item.qty}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>

@@ -20,7 +20,8 @@ import {
   AlertCircle,
   IndianRupee,
   CalendarDays,
-  Clock
+  Clock,
+  Fingerprint
 } from "lucide-react";
 import {
   DAYS_OF_WEEK,
@@ -62,6 +63,7 @@ export default function EditTrainerPage({ params }) {
     bio: "",
     monthlySalary: "",
     hireDate: "",
+    biometricUid: "",
     isActive: true
   });
 
@@ -95,6 +97,7 @@ export default function EditTrainerPage({ params }) {
             phone,
             password,
             trainer_cost,
+            biometric_uid,
             available_days,
             available_time_slots
           )
@@ -115,6 +118,7 @@ export default function EditTrainerPage({ params }) {
         bio: trainerData.bio || "",
         monthlySalary: trainerData.monthly_salary ?? "",
         hireDate: trainerData.hire_date || "",
+        biometricUid: trainerData.profiles?.biometric_uid || "",
         isActive: trainerData.is_active ?? true,
         profileId: trainerData.profile_id,
         availableDays: trainerData.profiles?.available_days || [],
@@ -222,12 +226,19 @@ export default function EditTrainerPage({ params }) {
           phone: formData.phone.trim() || null,
           password: formData.password.trim(),
           credentials_updated_at: new Date().toISOString(),
+          biometric_uid: formData.biometricUid.trim() || null,
           available_days: availableDays,
           available_time_slots: availableTimeSlots
         })
         .eq("id", formData.profileId);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        // A duplicate UID is the most likely failure here — say so plainly
+        if (profileError.code === "23505" && /biometric_uid/i.test(profileError.message || "")) {
+          throw new Error("This Biometric User ID is already assigned to someone else");
+        }
+        throw profileError;
+      }
 
       // Update gym_trainers
       const { error: trainerError } = await supabase
@@ -475,6 +486,32 @@ export default function EditTrainerPage({ params }) {
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">Used to calculate attendance-based salary earned every month.</p>
+          </div>
+
+          {/* Biometric User ID (eSSL F22 User ID) */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Biometric User ID
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-[#1a1c1c] text-white">
+                <Fingerprint className="h-4 w-4" />
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                name="biometricUid"
+                value={formData.biometricUid}
+                onChange={handleChange}
+                className="w-full pr-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#f0813d]/20 focus:border-transparent"
+                placeholder="F22 User ID (e.g. 901)"
+                style={{ paddingLeft: "3.25rem" }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              The User ID shown on the fingerprint device. First punch of the day becomes login,
+              every later punch moves the logout time forward. Leave blank to unlink.
+            </p>
           </div>
         </div>
 

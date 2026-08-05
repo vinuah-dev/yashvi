@@ -97,6 +97,24 @@ export default function AssignWorkoutPlanModal({ member, memberId, memberName, g
         fetchPlans();
     }, [actualGymId]);
 
+    // Shared helper for both assign paths. The app uses custom auth (not
+    // Supabase Auth), so the user id travels in the x-user-id header.
+    const callAssignApi = async (payload) => {
+        const storedUser = localStorage.getItem("gymUser");
+        const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+        const res = await fetch("/api/workouts/assign", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-user-id": String(currentUser?.id || ""),
+            },
+            body: JSON.stringify({ ...payload, p_gym_id: actualGymId }),
+        });
+
+        return res.json();
+    };
+
     const handleAssign = async () => {
         if (!selectedPlan) {
             showError("Please select a workout plan");
@@ -105,38 +123,19 @@ export default function AssignWorkoutPlanModal({ member, memberId, memberName, g
 
         setLoading(true);
         try {
-            // Check if member already has this workout plan assigned
-            const { data: existing } = await supabase
-                .from("member_workouts")
-                .select("id")
-                .eq("member_id", actualMemberId)
-                .eq("workout_plan_id", selectedPlan)
-                .maybeSingle();
+            // Assignment runs server-side (service role) so it works regardless
+            // of RLS state on member_workouts, and real errors come back to us.
+            const json = await callAssignApi({
+                action: "assign",
+                member_id: actualMemberId,
+                workout_plan_id: selectedPlan,
+                trainer_id: trainerId || null,
+            });
 
-            if (existing) {
-                showError("This workout plan is already assigned to this member");
+            if (json.error) {
+                showError(json.error);
                 setLoading(false);
                 return;
-            }
-
-            // Remove any existing workout plan assignments for this member
-            // (A member should only have one active workout plan at a time)
-            await supabase
-                .from("member_workouts")
-                .delete()
-                .eq("member_id", actualMemberId);
-
-            // Assign workout plan to member
-            const { error } = await supabase
-                .from("member_workouts")
-                .insert({
-                    member_id: actualMemberId,
-                    workout_plan_id: selectedPlan,
-                    assigned_by_trainer_id: trainerId || null,
-                });
-
-            if (error) {
-                throw error;
             }
 
             showSuccess("Workout plan assigned successfully!");
@@ -149,7 +148,7 @@ export default function AssignWorkoutPlanModal({ member, memberId, memberName, g
             onClose();
         } catch (error) {
             console.error("Error assigning workout plan:", error);
-            showError("Failed to assign workout plan. Please try again.");
+            showError(error.message || "Failed to assign workout plan");
         }
         setLoading(false);
     };
@@ -168,94 +167,38 @@ export default function AssignWorkoutPlanModal({ member, memberId, memberName, g
 
         setLoading(true);
         try {
-            // Get current user info for created_by and trainer_id
-            const storedUser = localStorage.getItem("gymUser");
-            const currentUser = storedUser ? JSON.parse(storedUser) : null;
-            const createdBy = currentUser?.id;
-            
-            // Use trainerId prop if available, otherwise use current user's ID
-            // This handles both trainer (has trainerId prop) and admin (uses their own ID) cases
-            const actualTrainerId = trainerId || createdBy;
-
-            // Create the workout plan with member_id to make it member-specific
-            const { data: newPlan, error: insertError } = await supabase
-                .from("workout_plans")
-                .insert({
-                    gym_id: targetGymId,
-                    title: formData.title,
-                    description: formData.description || null,
-                    goal: formData.goal || null,
-                    level: formData.level || null,
-                    is_template: false,
-                    created_by: createdBy,
-                    member_id: actualMemberId, // This makes it member-specific
-                    trainer_id: actualTrainerId, // Now properly set for both admin and trainer
+            // Build the day payload once and let the server create the plan,
+            // its days and exercises in one guarded pass (rolls back on error).
+            const dayPayload = Object.keys(days)
+                .map((dayNum) => {
+                    const day = days[dayNum];
+                    return {
+                        day_of_week: parseInt(dayNum),
+                        day_name: day.day_name,
+                        focus: day.focus || null,
+                        exercises: (day.exercises || []).filter(
+                            (ex) => ex.exercise_name && ex.exercise_name.trim()
+                        ),
+                    };
                 })
-                .select()
-                .single();
+                .filter((day) => day.exercises.length > 0 || day.focus);
 
-            if (insertError) throw insertError;
-            const planId = newPlan.id;
+            const json = await callAssignApi({
+                action: "create_assign",
+                member_id: actualMemberId,
+                trainer_id: trainerId || null,
+                title: formData.title,
+                description: formData.description || null,
+                goal: formData.goal || null,
+                level: formData.level || null,
+                days: dayPayload,
+            });
 
-            // Save days with exercises
-            for (const dayNum of Object.keys(days)) {
-                const day = days[dayNum];
-                if ((day.exercises && day.exercises.length > 0) || day.focus) {
-                    const { data: dayData, error: dayError } = await supabase
-                        .from("workout_plan_days")
-                        .insert({
-                            workout_plan_id: planId,
-                            day_of_week: parseInt(dayNum),
-                            day_name: day.day_name,
-                            focus: day.focus || null,
-                        })
-                        .select()
-                        .single();
-
-                    if (dayError) throw dayError;
-
-                    if (day.exercises && day.exercises.length > 0) {
-                        const exercisesToInsert = day.exercises
-                            .filter(ex => ex.exercise_name && ex.exercise_name.trim())
-                            .map((ex, index) => ({
-                                workout_day_id: dayData.id,
-                                exercise_name: ex.exercise_name,
-                                sets: ex.sets || null,
-                                reps: ex.reps || null,
-                                weight: ex.weight || null,
-                                rest_seconds: ex.rest_seconds || null,
-                                notes: ex.notes || null,
-                                exercise_order: index + 1,
-                            }));
-
-                        if (exercisesToInsert.length > 0) {
-                            const { error: exercisesError } = await supabase
-                                .from("workout_exercises")
-                                .insert(exercisesToInsert);
-
-                            if (exercisesError) throw exercisesError;
-                        }
-                    }
-                }
+            if (json.error) {
+                showError(json.error);
+                setLoading(false);
+                return;
             }
-
-            // Remove any existing workout plan assignments for this member
-            // (A member should only have one active workout plan at a time)
-            await supabase
-                .from("member_workouts")
-                .delete()
-                .eq("member_id", actualMemberId);
-
-            // Assign the newly created plan to the member
-            const { error: assignError } = await supabase
-                .from("member_workouts")
-                .insert({
-                    member_id: actualMemberId,
-                    workout_plan_id: planId,
-                    assigned_by_trainer_id: actualTrainerId, // Use the same resolved trainer ID
-                });
-
-            if (assignError) throw assignError;
 
             showSuccess("Custom workout plan created and assigned successfully!");
             if (onAssign) {

@@ -22,6 +22,7 @@ import {
   CalendarDays,
   Clock,
   Plus,
+  Fingerprint,
   X as XIcon
 } from "lucide-react";
 import {
@@ -49,6 +50,7 @@ export default function AddTrainerPage() {
     specialization: "",
     bio: "",
     monthlySalary: "",
+    biometricUid: "",
     availableDays: [],
     availableTimeSlots: {}
   });
@@ -162,6 +164,23 @@ export default function AddTrainerPage() {
           throw new Error(msg.split("DUPLICATE_PHONE:")[1]);
         }
         throw new Error(msg || "Failed to add trainer");
+      }
+
+      // Biometric User ID lives on the trainer's profile row. The RPC doesn't
+      // take it, so it is written straight after the trainer is created.
+      const newProfileId = data?.profile_id || data?.id || null;
+      if (formData.biometricUid.trim() && newProfileId) {
+        const { error: bioErr } = await supabase
+          .from("profiles")
+          .update({ biometric_uid: formData.biometricUid.trim() })
+          .eq("id", newProfileId);
+
+        if (bioErr) {
+          console.error("Biometric UID save error:", bioErr);
+          setError(`Trainer created, but the Biometric User ID could not be saved: ${bioErr.message}`);
+          setLoading(false);
+          return;
+        }
       }
 
       setSuccess(true);
@@ -464,6 +483,31 @@ export default function AddTrainerPage() {
               {errors.monthlySalary && (
                 <p className="text-[#f0813d] text-xs mt-1">{errors.monthlySalary}</p>
               )}
+            </div>
+
+            {/* Biometric User ID (eSSL F22 User ID) */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Biometric User ID
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-[#1a1c1c] text-white">
+                  <Fingerprint className="h-4 w-4" />
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.biometricUid}
+                  onChange={(e) => handleChange("biometricUid", e.target.value.replace(/\s/g, ""))}
+                  className="w-full pl-13 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#f0813d]/20 focus:border-transparent"
+                  placeholder="F22 User ID (e.g. 901)"
+                  style={{ paddingLeft: "3.25rem" }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Optional - the User ID shown on the fingerprint device. First punch of the day
+                becomes login, every later punch moves the logout time forward.
+              </p>
             </div>
 
 
