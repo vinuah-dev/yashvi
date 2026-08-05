@@ -449,7 +449,14 @@ export default async function admsRoutes(fastify, options) {
         .select();
       
       if (error) {
-        fastify.log.error({ msg: 'Supabase insert error', error });
+        fastify.log.error({
+          msg: 'Supabase insert error',
+          errorMessage: error.message,
+          errorCode: error.code,
+          errorDetails: error.details,
+          errorHint: error.hint,
+          attemptedColumns: Object.keys(dbRecords[0] || {}).join(', ')
+        });
         return reply.code(200).send('OK');
       }
       
@@ -469,6 +476,19 @@ export default async function admsRoutes(fastify, options) {
       // So the Next.js /attendance view reflects real-time entries
       // ============================================
       for (const r of dbRecords) {
+        // The `attendance` summary table requires a member_id, so unmatched
+        // punches (biometric_uid not linked to any member) are kept in the raw
+        // log only. Skipping them here avoids a NOT NULL violation.
+        if (!r.member_id) {
+          fastify.log.warn({
+            msg: 'Punch not linked to any member — raw log only',
+            user_id: r.user_id,
+            device_sn: r.device_sn,
+            hint: 'Set this User ID as the member\'s Biometric User ID in the app'
+          });
+          continue;
+        }
+
         await updateDailyAttendance({
           gym_id: r.gym_id,
           member_id: r.member_id,
