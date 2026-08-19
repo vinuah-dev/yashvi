@@ -220,15 +220,34 @@ export default function CustomerDashboard() {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
 
+        // The gym is closed on Sundays, so a Sunday without a punch must not
+        // count as a missed day.
+        const isClosedDay = (d) => d.getDay() === 0; // 0 = Sunday
+
+        const lastOpenDay = new Date(today);
+        if (!isClosedDay(lastOpenDay)) {
+          lastOpenDay.setDate(lastOpenDay.getDate() - 1);
+        }
+        while (isClosedDay(lastOpenDay)) {
+          lastOpenDay.setDate(lastOpenDay.getDate() - 1);
+        }
+
         const latestAttendance = sortedDates[0];
         if (
           latestAttendance &&
           (latestAttendance.toDateString() === today.toDateString() ||
-            latestAttendance.toDateString() === yesterday.toDateString())
+            latestAttendance.toDateString() === yesterday.toDateString() ||
+            latestAttendance.toDateString() === lastOpenDay.toDateString())
         ) {
           let expectedDate = new Date(latestAttendance);
 
           for (const attendanceDate of sortedDates) {
+            // Step over closed days so they never break the run.
+            while (isClosedDay(expectedDate)) {
+              expectedDate = new Date(expectedDate);
+              expectedDate.setDate(expectedDate.getDate() - 1);
+            }
+
             if (attendanceDate.toDateString() === expectedDate.toDateString()) {
               streak += 1;
               expectedDate = new Date(expectedDate);

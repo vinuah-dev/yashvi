@@ -140,7 +140,12 @@ async function getMemberInfo(gymId, fingerprintId, logger) {
       }
     }
     
-    return { member_id: member.id, membership_status, member_name: member.full_name };
+    return {
+      member_id: member.id,
+      membership_status,
+      member_name: member.full_name,
+      membership_end: membership?.end_date || null,
+    };
     
   } catch (err) {
     logger.error({ msg: 'Exception in getMemberInfo', error: err.message });
@@ -198,6 +203,223 @@ async function getTrainerInfo(gymId, fingerprintId, logger) {
     logger.error({ msg: 'Exception in getTrainerInfo', error: err.message });
     return { trainer_id: null, trainer_name: null };
   }
+}
+
+/**
+ * An expired member can still open the gate, because the F22 matches the
+ * fingerprint locally and only tells the server afterwards. So when an expired
+ * punch arrives we queue a delete of that user record on every device of the
+ * gym — the next attempt then finds no match and the gate stays shut.
+ *
+ * The member row is flagged so we queue this only once per expiry.
+ */
+async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) {
+  try {
+    const { data: member } = await supabase
+      .from('members')
+      .select('id, full_name, biometric_uid, biometric_blocked')
+      .eq('id', memberId)
+      .maybeSingle();
+
+    if (!member || !member.biometric_uid) return;
+    if (member.biometric_blocked) return; // already queued
+
+    // Gyms give members a buffer after expiry to come and pay. Access is only
+    // withdrawn once that buffer has run out.
+    const { data: gym } = await supabase
+      .from('gyms')
+      .select('biometric_grace_days, biometric_block_mode')
+      .eq('id', gymId)
+      .maybeSingle();
+
+    const graceDaysRaw = Number(gym?.biometric_grace_days);
+    const graceDays = Number.isFinite(graceDaysRaw) && graceDaysRaw >= 0 ? graceDaysRaw : 7;
+    const blockMode = gym?.biometric_block_mode === 'delete' ? 'delete' : 'disable';
+
+    if (expiryDate) {
+      const cutoff = new Date(expiryDate);
+      cutoff.setDate(cutoff.getDate() + graceDays);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      cutoff.setHours(0, 0, 0, 0);
+
+      if (today <= cutoff) {
+        logger.info({
+          msg: '⏳ Expired member still inside buffer period — access left open',
+          memberId,
+          expiryDate,
+          graceDays,
+        });
+        return;
+      }
+    }
+
+    const { data: devices } = await supabase
+      .from('biometric_devices')
+      .select('device_sn')
+      .eq('gym_id', gymId);
+
+    if (!devices || devices.length === 0) return;
+
+    const TAB = '\t';
+    // 'disable' keeps the enrolled finger on the device so a renewal can turn
+    // access straight back on; 'delete' removes the record outright.
+    const commandString =
+      blockMode === 'delete'
+        ? `DATA DELETE USERINFO PIN=${member.biometric_uid}`
+        : [
+            `DATA UPDATE USERINFO PIN=${member.biometric_uid}`,
+            `Name=${member.full_name || ''}`,
+            `Pri=0`,
+            `Passwd=`,
+            `Card=`,
+            `Grp=0`,
+            `TZ=0000000000000000`,
+            `Verify=-1`,
+          ].join(TAB);
+
+    const rows = devices.map((d) => ({
+      gym_id: gymId,
+      device_sn: d.device_sn,
+      command_string: commandString,
+      status: 'PENDING',
+    }));
+
+    const { error: insErr } = await supabase
+      .from('biometric_device_commands')
+      .insert(rows);
+
+    if (insErr) {
+      logger.error({ msg: 'Failed to queue expiry block command', error: insErr.message });
+      return;
+    }
+
+    await supabase
+      .from('members')
+      .update({ biometric_blocked: true, biometric_blocked_at: new Date().toISOString() })
+      .eq('id', member.id);
+
+    logger.warn({
+      msg: '🚫 Buffer period over — member access withdrawn on devices',
+      memberId,
+      biometric_uid: member.biometric_uid,
+      mode: blockMode,
+      devices: rows.length,
+    });
+  } catch (e) {
+    logger.error({ msg: 'Exception in blockExpiredMemberOnDevices', error: e.message });
+  }
+}
+
+/**
+ * Devices push more than attendance to /iclock/cdata and /iclock/fdata:
+ * user records (USERINFO) and, on firmwares that support it, the enrolled
+ * fingerprint templates (FINGERTMP / "FP" lines).
+ *
+ * Templates are the important part. Blocking a member means deleting their
+ * user record from the scanner (the only command every firmware honours), so
+ * without a stored copy of the finger they'd have to be re-enrolled on
+ * renewal. With a copy, we just push it back.
+ *
+ * Everything is also written to `biometric_device_logs` so the diagnostic
+ * screen can show whether this particular device uploads templates at all.
+ */
+async function captureNonAttendancePush({ gymId, deviceSN, endpoint, tableType, body, logger }) {
+  const raw = typeof body === 'string' ? body : JSON.stringify(body || '');
+
+  // Keep a bounded copy for diagnostics — templates can be a few KB each.
+  try {
+    await supabase.from('biometric_device_logs').insert({
+      gym_id: gymId || null,
+      device_sn: deviceSN,
+      endpoint,
+      table_name: tableType || null,
+      raw_body: raw.slice(0, 8000),
+    });
+  } catch (e) {
+    logger.error({ msg: 'Failed to record device push', error: e.message });
+  }
+
+  const templates = parseFingerprintTemplates(raw);
+  if (templates.length === 0) {
+    logger.info({ msg: 'Device push stored (no templates in it)', deviceSN, table: tableType });
+    return;
+  }
+
+  if (!gymId) {
+    logger.warn({ msg: 'Templates received from unregistered device', deviceSN });
+    return;
+  }
+
+  let saved = 0;
+  for (const t of templates) {
+    try {
+      const { error } = await supabase
+        .from('biometric_templates')
+        .upsert(
+          {
+            gym_id: gymId,
+            biometric_uid: String(t.pin),
+            finger_id: t.fid,
+            template_size: t.size,
+            is_valid: t.valid,
+            template_data: t.template,
+            device_sn: deviceSN,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'gym_id,biometric_uid,finger_id' },
+        );
+      if (!error) saved += 1;
+      else logger.error({ msg: 'Template save failed', error: error.message, pin: t.pin });
+    } catch (e) {
+      logger.error({ msg: 'Template save exception', error: e.message });
+    }
+  }
+
+  logger.info({ msg: '🔒 Fingerprint templates backed up', deviceSN, count: saved });
+}
+
+/**
+ * Pull fingerprint templates out of a device push.
+ *
+ * Firmwares differ in how they label these lines, so both the "FP " prefix and
+ * the bare tab-separated form are accepted:
+ *   FP PIN=9\tFID=0\tSize=1024\tValid=1\tTMP=<base64>
+ */
+function parseFingerprintTemplates(raw) {
+  if (!raw || typeof raw !== 'string') return [];
+  const out = [];
+
+  for (const line of raw.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (!/TMP=/i.test(trimmed)) continue; // templates always carry TMP=
+
+    const fields = {};
+    // TMP is base64 and may contain '=' padding, so it's read to end of line.
+    const tmpMatch = trimmed.match(/TMP=(.*)$/i);
+    const head = tmpMatch ? trimmed.slice(0, tmpMatch.index) : trimmed;
+
+    for (const part of head.split(/[\t\s]+/)) {
+      const eq = part.indexOf('=');
+      if (eq <= 0) continue;
+      fields[part.slice(0, eq).toUpperCase()] = part.slice(eq + 1);
+    }
+
+    const pin = fields.PIN;
+    const template = tmpMatch ? tmpMatch[1].trim() : '';
+    if (!pin || !template) continue;
+
+    out.push({
+      pin,
+      fid: Number.isFinite(Number(fields.FID)) ? Number(fields.FID) : 0,
+      size: Number.isFinite(Number(fields.SIZE)) ? Number(fields.SIZE) : template.length,
+      valid: Number.isFinite(Number(fields.VALID)) ? Number(fields.VALID) : 1,
+      template,
+    });
+  }
+
+  return out;
 }
 
 /**
@@ -525,10 +747,16 @@ export default async function admsRoutes(fastify, options) {
       // Only ATTLOG rows are attendance; ignore the rest.
       const tableType = String(query?.table || query?.TABLE || '').toUpperCase();
       if (tableType && tableType !== 'ATTLOG') {
-        fastify.log.info({
-          msg: 'Ignoring non-attendance table push',
+        // Not attendance — but it may be fingerprint templates or user records,
+        // which we want to keep so a blocked member can be restored later
+        // without re-enrolling. Everything else is recorded for diagnostics.
+        await captureNonAttendancePush({
+          gymId: gym_id,
           deviceSN,
-          table: tableType
+          endpoint: 'cdata',
+          tableType,
+          body,
+          logger: fastify.log,
         });
         return reply.code(200).send('OK');
       }
@@ -547,13 +775,19 @@ export default async function admsRoutes(fastify, options) {
       
       for (const record of records) {
         // Lookup member and check membership status
-        const { member_id, membership_status, member_name } = await getMemberInfo(
+        const { member_id, membership_status, member_name, membership_end } = await getMemberInfo(
           gym_id, 
           record.user_id, 
           fastify.log
         );
         
         const recordTimestamp = new Date(record.timestamp).toISOString();
+
+        // An expired member just opened the gate locally. Queue removal of
+        // their user record so the next attempt is refused by the device.
+        if (member_id && (membership_status === 'EXPIRED' || membership_status === 'CANCELLED')) {
+          await blockExpiredMemberOnDevices(gym_id, member_id, membership_end, fastify.log);
+        }
 
         // If the UID did not match a member, it may belong to a trainer.
         // Members are always checked first, so member behaviour is unchanged.
@@ -804,20 +1038,44 @@ export default async function admsRoutes(fastify, options) {
         }
       }
       
+      // The device reports the outcome as Return=<code>; 0 means it actually
+      // ran. Anything else (e.g. -1002 bad syntax, -1004 unsupported on this
+      // model) means the command was rejected, so it must not be recorded as
+      // a success — otherwise a member would look blocked while the gate still
+      // opens for them.
+      let returnCode = null;
+      const returnSource = `${body && typeof body === 'string' ? body : ''} ${JSON.stringify(query || {})}`;
+      const returnMatch = returnSource.match(/Return[=:"\s]+(-?\d+)/i);
+      if (returnMatch) returnCode = Number(returnMatch[1]);
+
       if (commandId) {
-        // Update command status to SUCCESS
+        const succeeded = returnCode === null || returnCode === 0;
+
         const { error } = await supabase
           .from('biometric_device_commands')
-          .update({ 
-            status: 'SUCCESS',
+          .update({
+            status: succeeded ? 'SUCCESS' : 'FAILED',
+            return_code: returnCode,
+            confirmed_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           })
           .eq('id', commandId);
-        
+
         if (error) {
-          fastify.log.error({ msg: 'Failed to update command to SUCCESS', error });
+          fastify.log.error({ msg: 'Failed to update command status', error });
+        } else if (succeeded) {
+          fastify.log.info({ msg: '✅ Command executed on device', commandId, returnCode });
         } else {
-          fastify.log.info({ msg: 'Command marked as SUCCESS', commandId });
+          fastify.log.warn({
+            msg: '❌ Device rejected command',
+            commandId,
+            returnCode,
+            hint: returnCode === -1004
+              ? 'Not supported on this device model'
+              : returnCode === -1002
+                ? 'Invalid command syntax'
+                : 'See ZKTeco return codes',
+          });
         }
       }
       
@@ -835,6 +1093,35 @@ export default async function admsRoutes(fastify, options) {
    */
   // Some eSSL firmwares (e.g. Ver 8.0.4.3) append .aspx to every iclock URL,
   // so each endpoint is registered on both the plain and .aspx path.
+  // Some firmwares upload biometric templates to /iclock/fdata rather than
+  // /iclock/cdata, so the same capture runs for both.
+  const handleFdata = async (request, reply) => {
+    try {
+      const { query, body } = request;
+      const deviceSN = getDeviceSN(query);
+      const { gym_id: gymId } = deviceSN
+        ? await getGymFromDeviceSN(deviceSN, fastify.log)
+        : { gym_id: null };
+
+      await captureNonAttendancePush({
+        gymId,
+        deviceSN,
+        endpoint: 'fdata',
+        tableType: String(query?.table || query?.TABLE || 'FDATA').toUpperCase(),
+        body,
+        logger: fastify.log,
+      });
+    } catch (e) {
+      fastify.log.error({ msg: 'Error handling fdata', error: e.message });
+    }
+    return reply.code(200).send('OK');
+  };
+
+  fastify.post('/fdata', handleFdata);
+  fastify.post('/fdata.aspx', handleFdata);
+  fastify.get('/fdata', handleFdata);
+  fastify.get('/fdata.aspx', handleFdata);
+
   fastify.post('/cdata', handleCdataPost);
   fastify.post('/cdata.aspx', handleCdataPost);
   fastify.get('/cdata', handleCdataGet);

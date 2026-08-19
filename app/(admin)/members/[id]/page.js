@@ -582,6 +582,41 @@ export default function MemberDetailPage() {
     }
   };
 
+  // ── Biometric gate access ─────────────────────────────────────────────
+  // The scanner opens the gate on its own, so blocking someone means removing
+  // their user record (and stored fingerprint) from every device of the gym.
+  const [bioBusy, setBioBusy] = useState(false);
+
+  const callBiometricAccess = async (action) => {
+    setBioBusy(true);
+    try {
+      const res = await fetch("/api/biometric/access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(JSON.parse(localStorage.getItem("gymUser") || "{}")?.id || ""),
+        },
+        body: JSON.stringify({
+          action,
+          p_gym_id: selectedGym?.id,
+          member_id: member.id,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Request failed");
+
+      if (action === "block") {
+        showSuccess(`Fingerprint removal queued on ${json.devices} device(s).`);
+      } else {
+        showSuccess("Access restored. Re-enroll the finger on the device.");
+      }
+    } catch (e) {
+      showError(e.message || "Could not update device access");
+    } finally {
+      setBioBusy(false);
+    }
+  };
+
   const handleDeleteMember = async () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${member.name}? This action cannot be undone. All associated data including memberships, payments, and attendance records will be permanently deleted.`
@@ -590,6 +625,34 @@ export default function MemberDetailPage() {
     if (!confirmDelete) return;
 
     try {
+      // Remove the fingerprint from the gym's scanners first. The F22 opens the
+      // gate locally on a match, so a deleted member would otherwise still get
+      // in. Failing this shouldn't block the delete itself.
+      try {
+        const { data: bioRow } = await supabase
+          .from("members")
+          .select("biometric_uid")
+          .eq("id", member.id)
+          .maybeSingle();
+
+        if (bioRow?.biometric_uid) {
+          await fetch("/api/biometric/access", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-user-id": String(JSON.parse(localStorage.getItem("gymUser") || "{}")?.id || ""),
+            },
+            body: JSON.stringify({
+              action: "purge_uid",
+              p_gym_id: selectedGym?.id,
+              biometric_uid: bioRow.biometric_uid,
+            }),
+          });
+        }
+      } catch (bioErr) {
+        console.error("Could not queue fingerprint removal:", bioErr);
+      }
+
       const { error } = await supabase
         .from("members")
         .delete()
@@ -1170,6 +1233,31 @@ export default function MemberDetailPage() {
             {/* Member Controls Section */}
             <div className="bg-white rounded-xl border border-gray-300 shadow-sm p-3 space-y-2">
               <p className="text-[11px] uppercase tracking-wide text-gray-600 font-semibold">Member Controls</p>
+
+              {!isTrainer && canWrite && (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-2.5">
+                  <p className="text-[11px] font-semibold text-gray-700 mb-1.5">Gate Access</p>
+                  <p className="text-[11px] text-gray-500 mb-2 leading-relaxed">
+                    Blocking removes this member&apos;s fingerprint from the scanners so the gate won&apos;t open. They must be re-enrolled on the device afterwards.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => callBiometricAccess("block")}
+                      disabled={bioBusy}
+                      className="px-3 py-2 bg-orange-50 border border-[#f0813d] rounded-lg text-xs font-semibold text-[#f0813d] active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      {bioBusy ? "Working..." : "Block Access"}
+                    </button>
+                    <button
+                      onClick={() => callBiometricAccess("unblock")}
+                      disabled={bioBusy}
+                      className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      Allow Again
+                    </button>
+                  </div>
+                </div>
+              )}
               <div className={`grid ${isTrainer ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
                 <button
                   onClick={() => router.push(`/members/edit?id=${member.id}`)}

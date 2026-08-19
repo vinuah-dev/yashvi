@@ -45,6 +45,9 @@ export default function BiometricDevicesPage() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ device_sn: "", device_name: "", location: "" });
+  const [access, setAccess] = useState({ graceDays: 7, blockMode: "disable" });
+  const [accessDraft, setAccessDraft] = useState({ graceDays: "7", blockMode: "disable" });
+  const [accessSaving, setAccessSaving] = useState(false);
 
   const call = useCallback(
     async (payload) => {
@@ -76,9 +79,65 @@ export default function BiometricDevicesPage() {
     }
   }, [call, selectedGym?.id, showError]);
 
+  const fetchAccess = useCallback(async () => {
+    if (!selectedGym?.id) return;
+    try {
+      const res = await fetch("/api/biometric/access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
+        body: JSON.stringify({ action: "settings", p_gym_id: selectedGym.id }),
+      });
+      const json = await res.json();
+      if (json?.data) {
+        setAccess(json.data);
+        setAccessDraft({
+          graceDays: String(json.data.graceDays),
+          blockMode: json.data.blockMode,
+        });
+      }
+    } catch {
+      // keep defaults
+    }
+  }, [authUser?.id, selectedGym?.id]);
+
+  const saveAccess = async () => {
+    const days = Number(accessDraft.graceDays);
+    if (!Number.isFinite(days) || days < 0 || days > 90) {
+      showError("Buffer days must be between 0 and 90.");
+      return;
+    }
+    setAccessSaving(true);
+    try {
+      const res = await fetch("/api/settings/biometric-access", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
+        body: JSON.stringify({
+          p_gym_id: selectedGym?.id,
+          biometric_grace_days: days,
+          biometric_block_mode: accessDraft.blockMode,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to save");
+      setAccess({ graceDays: days, blockMode: accessDraft.blockMode });
+      showSuccess("Access rules saved");
+    } catch (e) {
+      showError(e.message);
+    } finally {
+      setAccessSaving(false);
+    }
+  };
+
   useEffect(() => {
     fetchDevices();
-  }, [fetchDevices]);
+    fetchAccess();
+  }, [fetchDevices, fetchAccess]);
 
   const openAdd = () => {
     setEditing(null);
@@ -155,6 +214,85 @@ export default function BiometricDevicesPage() {
                 Each scanner is identified by its <span className="font-semibold">Serial Number</span> (printed on the device / in its menu — not the IP address). Register it here once and every fingerprint punch from it is automatically recorded for this gym. The SN never changes, even if the device's IP or network does.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Access rules */}
+        <div className="mx-1 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="font-semibold text-gray-900 mb-1">Expired Member Access</p>
+          <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+            The scanner opens the gate on its own, so an expired member keeps getting in until their access is withdrawn on the device.
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-1.5">
+                Buffer period after expiry
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="90"
+                  value={accessDraft.graceDays}
+                  onChange={(e) => setAccessDraft((d) => ({ ...d, graceDays: e.target.value }))}
+                  className="w-24 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-[#f0813d] focus:ring-2 focus:ring-[#f0813d]/20"
+                />
+                <span className="text-sm text-gray-600">days</span>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Members can still enter for this many days after expiry, so they get a chance to renew. Set 0 to block immediately.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-1.5">
+                How to block
+              </label>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setAccessDraft((d) => ({ ...d, blockMode: "disable" }))}
+                  className={`w-full text-left rounded-xl border p-3 transition-all ${
+                    accessDraft.blockMode === "disable"
+                      ? "border-[#f0813d] bg-[#f0813d]/5"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-gray-900">Revoke access (recommended)</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Fingerprint stays on the device. Renewing turns access straight back on — nothing to re-enroll.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAccessDraft((d) => ({ ...d, blockMode: "delete" }))}
+                  className={`w-full text-left rounded-xl border p-3 transition-all ${
+                    accessDraft.blockMode === "delete"
+                      ? "border-[#f0813d] bg-[#f0813d]/5"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-gray-900">Remove from device</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Works on every device, but the fingerprint is erased and has to be enrolled again on renewal. Use this only if the option above doesn&apos;t work on your scanner.
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={saveAccess}
+              disabled={
+                accessSaving ||
+                (String(access.graceDays) === accessDraft.graceDays &&
+                  access.blockMode === accessDraft.blockMode)
+              }
+              className="w-full rounded-xl bg-gradient-to-r from-[#f0813d] to-[#9c4400] py-2.5 text-sm font-bold text-white disabled:opacity-50 active:scale-95 transition-all"
+            >
+              {accessSaving ? "Saving..." : "Save Access Rules"}
+            </button>
           </div>
         </div>
 

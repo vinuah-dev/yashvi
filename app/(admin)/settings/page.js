@@ -131,6 +131,14 @@ const settingsSections = [
     color: "from-[#f0813d] to-[#9c4400]"
   },
   {
+    id: "biometric-diagnostics",
+    title: "Biometric Diagnostics",
+    description: "Check fingerprint backups and device command results",
+    icon: Fingerprint,
+    href: "/settings/biometric-diagnostics",
+    color: "from-[#f0813d] to-[#9c4400]"
+  },
+  {
     id: "biometric-devices",
     title: "Biometric Devices",
     description: "Register fingerprint scanners (eSSL F22) for this gym",

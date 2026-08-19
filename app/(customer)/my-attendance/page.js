@@ -95,25 +95,44 @@ export default function CustomerAttendancePage() {
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
 
+        // The gym is closed on Sundays, so a Sunday with no punch must not be
+        // treated as a broken streak. Walk back past any closed day.
+        const isClosedDay = (d) => d.getDay() === 0; // 0 = Sunday
+
+        let lastOpenDay = new Date(today);
+        if (!isClosedDay(lastOpenDay)) {
+          lastOpenDay.setDate(lastOpenDay.getDate() - 1);
+        }
+        while (isClosedDay(lastOpenDay)) {
+          lastOpenDay.setDate(lastOpenDay.getDate() - 1);
+        }
+
         const latestAttendance = sortedDates[0];
-        if (latestAttendance && 
-            (latestAttendance.toDateString() === today.toDateString() || 
-             latestAttendance.toDateString() === yesterday.toDateString())) {
+        if (latestAttendance &&
+            (latestAttendance.toDateString() === today.toDateString() ||
+             latestAttendance.toDateString() === yesterday.toDateString() ||
+             latestAttendance.toDateString() === lastOpenDay.toDateString())) {
           
           let currentDate = new Date(latestAttendance);
           currentDate.setHours(0, 0, 0, 0);
           let i = 0;
           
           while (i < sortedDates.length) {
+            // Gym is shut on Sundays — those days can't break a streak.
+            if (isClosedDay(currentDate)) {
+              currentDate.setDate(currentDate.getDate() - 1);
+              continue;
+            }
+
             const attendanceDate = new Date(sortedDates[i]);
             attendanceDate.setHours(0, 0, 0, 0);
-            
+
             if (attendanceDate.getTime() === currentDate.getTime()) {
               streak++;
               currentDate.setDate(currentDate.getDate() - 1);
               i++;
             } else if (attendanceDate < currentDate) {
-              break; // Gap in streak
+              break; // Genuine gap on an open day
             } else {
               i++;
             }

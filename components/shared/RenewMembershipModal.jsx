@@ -397,6 +397,26 @@ export default function RenewMembershipModal({ member, gymId, gymData, onClose, 
                 renewedAt: renewalEventTimestamp,
             };
 
+            // The member may have been locked out on the scanners after their
+            // buffer period ran out — renewing should let them back in without
+            // anyone having to touch the device.
+            try {
+                await fetch("/api/biometric/access", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-user-id": String(authUser?.id || ""),
+                    },
+                    body: JSON.stringify({
+                        action: "unblock",
+                        p_gym_id: gymId || member?.gymId,
+                        member_id: member?.id,
+                    }),
+                });
+            } catch (bioErr) {
+                console.error("Could not restore device access:", bioErr);
+            }
+
             setLoading(false);
             
             // Show success message
