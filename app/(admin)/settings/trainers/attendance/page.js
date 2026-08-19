@@ -354,6 +354,28 @@ export default function TrainerAttendanceQuickPage() {
       <Header title="Trainer Attendance" />
 
       <main className="px-4 py-4 space-y-4">
+        {/* Attendance Type Switcher */}
+        <section className="bg-white rounded-[22px] p-1.5 border border-gray-200 shadow-sm">
+          <div className="grid grid-cols-2 gap-1">
+            <button
+              type="button"
+              onClick={() => router.push("/attendance")}
+              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+            >
+              <Users className="w-4 h-4" />
+              Member
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/settings/trainers/attendance")}
+              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white shadow-sm transition-all"
+            >
+              <UserCheck className="w-4 h-4" />
+              Trainer
+            </button>
+          </div>
+        </section>
+
         <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>

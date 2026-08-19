@@ -19,6 +19,7 @@ import {
   Plus,
   X,
   Users,
+  UserCheck,
   BarChart3,
   History
 } from "lucide-react";
@@ -395,6 +396,28 @@ export default function AttendancePage() {
       <Header title="Attendance" showBack={false} />
 
       <main className="px-3 md:px-8 lg:px-12 py-3 md:py-6 space-y-4 max-w-7xl mx-auto w-full">
+        {/* Attendance Type Switcher */}
+        <section className="mx-1 bg-white rounded-[22px] p-1.5 border border-[#ececec] shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
+          <div className="grid grid-cols-2 gap-1">
+            <button
+              type="button"
+              onClick={() => router.push("/attendance")}
+              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white shadow-sm transition-all"
+            >
+              <Users className="w-4 h-4" />
+              Member
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/settings/trainers/attendance")}
+              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+            >
+              <UserCheck className="w-4 h-4" />
+              Trainer
+            </button>
+          </div>
+        </section>
+
         {/* Date Selector - Premium Calendar Band */}
         <section className="mx-1 overflow-hidden rounded-[1.75rem] border border-[#f0813d]/30 bg-white shadow-[0_18px_45px_rgba(26,28,28,0.08)]">
           <div className="relative overflow-hidden bg-gradient-to-br from-[#f0813d] to-[#9c4400] p-4 text-white">
