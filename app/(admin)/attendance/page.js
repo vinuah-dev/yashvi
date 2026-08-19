@@ -621,9 +621,10 @@ export default function AttendancePage() {
               </div>
             ) : (
               <>
-  <div className="hidden md:grid grid-cols-3 gap-4 px-6 py-4 bg-[#ebe5e1] rounded-2xl mx-1 text-xs font-black uppercase tracking-[0.15em] text-[#6e625c]">
+  <div className="hidden md:grid grid-cols-4 gap-4 px-6 py-4 bg-[#ebe5e1] rounded-2xl mx-1 text-xs font-black uppercase tracking-[0.15em] text-[#6e625c]">
     <div>Member</div>
-    <div>Status</div>
+    <div>In Time</div>
+    <div>Out Time</div>
     <div>Actions</div>
   </div>
 
@@ -660,7 +661,17 @@ export default function AttendancePage() {
                               <span className="font-medium">Membership expired - Requires renewal</span>
                             </div>
                           )}
-                          {/* Members only need a presence mark, not in/out times */}
+                          {/* Member check-in / check-out times */}
+                          <div className="grid grid-cols-2 gap-2 mt-2 max-w-sm">
+                            <div className="rounded-lg bg-green-50 border border-green-100 px-2.5 py-2">
+                              <p className="text-[9px] font-bold uppercase tracking-wide text-green-600">In Time</p>
+                              <p className="text-xs font-bold text-gray-800 mt-0.5">{record.checkIn || "—"}</p>
+                            </div>
+                            <div className="rounded-lg bg-gray-50 border border-gray-200 px-2.5 py-2">
+                              <p className="text-[9px] font-bold uppercase tracking-wide text-gray-500">Out Time</p>
+                              <p className="text-xs font-bold text-gray-800 mt-0.5">{record.checkOut || "Not checked out"}</p>
+                            </div>
+                          </div>
                           {record.count > 1 && (
                             <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
                               <Clock className="w-3 h-3" />
