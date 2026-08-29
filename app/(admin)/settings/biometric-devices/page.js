@@ -247,8 +247,11 @@ export default function BiometricDevicesPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1.5">
-                How to block
+                What happens on renewal
               </label>
+              <p className="text-xs text-gray-500 mb-2 leading-relaxed">
+                Blocking always removes the member from the scanner — that is the only instruction every eSSL model obeys. This setting decides how they get back in.
+              </p>
               <div className="space-y-2">
                 <button
                   type="button"
@@ -259,9 +262,9 @@ export default function BiometricDevicesPage() {
                       : "border-gray-200 bg-white"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-gray-900">Revoke access (recommended)</p>
+                  <p className="text-sm font-semibold text-gray-900">Restore automatically (recommended)</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Fingerprint stays on the device. Renewing turns access straight back on — nothing to re-enroll.
+                    The saved fingerprint is pushed back to the device on renewal, so the member never touches the scanner again. Needs a backed-up finger — check Diagnostics.
                   </p>
                 </button>
 
@@ -274,9 +277,9 @@ export default function BiometricDevicesPage() {
                       : "border-gray-200 bg-white"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-gray-900">Remove from device</p>
+                  <p className="text-sm font-semibold text-gray-900">Enroll again on the machine</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Works on every device, but the fingerprint is erased and has to be enrolled again on renewal. Use this only if the option above doesn&apos;t work on your scanner.
+                    Staff takes the member&apos;s fingerprint on the device again after renewal. Works on every scanner, but needs someone at the machine.
                   </p>
                 </button>
               </div>

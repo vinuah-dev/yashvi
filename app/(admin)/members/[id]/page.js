@@ -606,9 +606,17 @@ export default function MemberDetailPage() {
       if (!res.ok) throw new Error(json.error || "Request failed");
 
       if (action === "block") {
-        showSuccess(`Fingerprint removal queued on ${json.devices} device(s).`);
+        showSuccess(
+          json.backedUp
+            ? `Fingerprint removal queued on ${json.devices} device(s). The finger is backed up, so renewal will restore it automatically.`
+            : `Fingerprint removal queued on ${json.devices} device(s). No backup of this finger exists — renewal will need a fresh enrollment.`,
+        );
+      } else if (json.needsReEnroll) {
+        showSuccess("Access restored. Enroll the finger again on the device.");
       } else {
-        showSuccess("Access restored. Re-enroll the finger on the device.");
+        showSuccess(
+          `Access restored. ${json.fingers} fingerprint(s) pushed back to the device — no re-enrollment needed.`,
+        );
       }
     } catch (e) {
       showError(e.message || "Could not update device access");

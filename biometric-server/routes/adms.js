@@ -261,22 +261,36 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
 
     if (!devices || devices.length === 0) return;
 
-    const TAB = '\t';
-    // 'disable' keeps the enrolled finger on the device so a renewal can turn
-    // access straight back on; 'delete' removes the record outright.
-    const commandString =
-      blockMode === 'delete'
-        ? `DATA DELETE USERINFO PIN=${member.biometric_uid}`
-        : [
-            `DATA UPDATE USERINFO PIN=${member.biometric_uid}`,
-            `Name=${member.full_name || ''}`,
-            `Pri=0`,
-            `Passwd=`,
-            `Card=`,
-            `Grp=0`,
-            `TZ=0000000000000000`,
-            `Verify=-1`,
-          ].join(TAB);
+    // Removing the user record is the only command every eSSL firmware
+    // honours. There is no Enabled/Disabled field in the ADMS USERINFO set —
+    // that bit only exists in the binary SDK on port 4370 — so an "update the
+    // user and hope the device refuses them" command is accepted with
+    // Return=0 and changes nothing, leaving the gate open for an expired
+    // member who shows as blocked in the dashboard.
+    //
+    // blockMode therefore decides what happens on RENEWAL, not now:
+    //   'disable' -> the saved fingerprint is pushed back, no re-enrollment
+    //   'delete'  -> staff enrolls the finger again on the machine
+    const commandString = `DATA DELETE USERINFO PIN=${member.biometric_uid}`;
+
+    // Only meaningful for 'disable'. Recorded so staff can be warned at
+    // renewal time instead of discovering it at the gate.
+    const { count: templateCount } = await supabase
+      .from('biometric_templates')
+      .select('id', { count: 'exact', head: true })
+      .eq('gym_id', gymId)
+      .eq('biometric_uid', String(member.biometric_uid));
+
+    const hasBackup = (templateCount || 0) > 0;
+
+    if (blockMode === 'disable' && !hasBackup) {
+      logger.warn({
+        msg: '⚠️ No fingerprint backup for this member — renewal will need re-enrollment',
+        memberId,
+        biometric_uid: member.biometric_uid,
+        hint: 'Check /settings/biometric-diagnostics to see whether this device uploads templates',
+      });
+    }
 
     const rows = devices.map((d) => ({
       gym_id: gymId,
@@ -305,6 +319,7 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
       biometric_uid: member.biometric_uid,
       mode: blockMode,
       devices: rows.length,
+      restoreOnRenewal: blockMode === 'disable' && hasBackup,
     });
   } catch (e) {
     logger.error({ msg: 'Exception in blockExpiredMemberOnDevices', error: e.message });
