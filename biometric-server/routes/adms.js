@@ -646,6 +646,41 @@ function parseCommandResults(body, query) {
 }
 
 /**
+ * Read the device's own status counters out of the INFO parameter it attaches
+ * to /iclock/getrequest:
+ *
+ *   INFO=Ver 8.0.4.3-20240116,11,15,150,192.168.1.201,10,-1,0,0,100,0,0,0
+ *          firmware        users^  ^fingers ^attlogs  ^ip
+ *
+ * This is the device's own count, so it is the cheapest way to tell whether a
+ * delete actually landed: after a successful DATA DELETE USERINFO the user and
+ * fingerprint counts drop. Without it the only way to check is walking to the
+ * machine and opening Menu → User Mgt.
+ *
+ * Positions beyond the IP vary between firmwares, so only the ones confirmed
+ * against this F22 are named.
+ */
+function parseDeviceInfo(info) {
+  if (!info || typeof info !== 'string') return null;
+
+  const parts = info.split(',').map((p) => p.trim());
+  if (parts.length < 4) return null;
+
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  return {
+    firmware: parts[0] || null,
+    users: num(parts[1]),
+    fingerprints: num(parts[2]),
+    attendanceRecords: num(parts[3]),
+    ip: parts[4] || null,
+  };
+}
+
+/**
  * Get device serial number from request
  */
 function getDeviceSN(query) {
@@ -1012,6 +1047,14 @@ export default async function admsRoutes(fastify, options) {
         msg: 'Device polling for commands',
         deviceSN
       });
+
+      // The device reports its own user / fingerprint counts here. Logged at
+      // info level because it is how you confirm a delete actually landed:
+      // the counts drop when the scanner really removed the record.
+      const deviceInfo = parseDeviceInfo(query.INFO || query.info);
+      if (deviceInfo) {
+        fastify.log.info({ msg: '📟 Device status', deviceSN, ...deviceInfo });
+      }
       
       // Get gym_id for this device
       const { gym_id, error: deviceError } = await getGymFromDeviceSN(deviceSN, fastify.log);
