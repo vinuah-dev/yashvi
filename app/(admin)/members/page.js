@@ -10,6 +10,7 @@ const RenewMembershipModal = dynamic(() => import("@/components/shared/RenewMemb
 const ShareReceiptModal = dynamic(() => import("@/components/shared/ShareReceiptModal"), { ssr: false });
 import { MembersPageSkeleton } from "@/components/shared/Skeleton";
 import RouteLoadingScreen from "@/components/shared/RouteLoadingScreen";
+import TrainersView from "@/components/shared/TrainersView";
 import { useUserRole } from "@/lib/hooks/useUserRole";
 import {
   Users,
@@ -37,6 +38,7 @@ import {
   Download,
   FileText,
   FileSpreadsheet,
+  Dumbbell,
 } from "lucide-react";
 
 const PAGE_SIZE = 20;
@@ -353,10 +355,45 @@ const MemberCard = memo(function MemberCard({
   );
 });
 
+// Members and trainers are both "people at the gym", so they share one screen.
+// Trainers still live at /settings/trainers for anyone landing there directly.
+function ViewSwitch({ value, onChange }) {
+  const tabs = [
+    { id: "members", label: "Members", Icon: Users },
+    { id: "trainers", label: "Trainers", Icon: Dumbbell },
+  ];
+
+  return (
+    <div className="flex gap-1 rounded-[20px] bg-white border border-[#ececec] p-1 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+      {tabs.map(({ id, label, Icon }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => onChange(id)}
+          aria-pressed={value === id}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-2xl py-2.5 text-sm font-bold transition-all active:scale-95 ${
+            value === id
+              ? "bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white"
+              : "text-gray-600"
+          }`}
+          style={{ minHeight: "44px" }}
+        >
+          <Icon className="w-4 h-4" />
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function MembersPage() {
   const router = useRouter();
   const { canViewFinance, isTrainer, isViewOnly, user, isReady, selectedGym: authGym } = useAuthContext();
   const roleLoading = !isReady;
+
+  // Members and trainers share this screen; the switch at the top picks which
+  // list is shown, so staff don't have to go through Settings for trainers.
+  const [view, setView] = useState("members");
 
   // Search & filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -1159,6 +1196,20 @@ Best regards,
     }
   }, [isTrainer, isViewOnly, refreshData]);
 
+  // The trainer list fetches its own data, so it is rendered before the member
+  // loading gate — switching tabs stays instant even while members load.
+  if (view === "trainers") {
+    return (
+      <div className="members-page-theme min-h-screen bg-[#f6f3f1] text-[#1a1c1c] safe-area-inset-bottom">
+        <Header title="Trainers" showBack={false} />
+        <div className="px-3 md:px-8 lg:px-12 pt-3 md:pt-6 max-w-7xl mx-auto w-full">
+          <ViewSwitch value={view} onChange={setView} />
+        </div>
+        <TrainersView showHeader={false} />
+      </div>
+    );
+  }
+
   // ─── Loading / no-gym states ─────────────────────────────────
   if (loading) {
     return <RouteLoadingScreen variant="members" />;
@@ -1208,6 +1259,8 @@ Best regards,
       <Header title="Members" showBack={false} />
 
       <main className="px-3 md:px-8 lg:px-12 py-3 md:py-6 space-y-4 max-w-7xl mx-auto w-full">
+        <ViewSwitch value={view} onChange={setView} />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 px-1">
           <div className="relative overflow-hidden bg-white rounded-[24px] p-4 border border-[#ececec] shadow-[0_10px_30px_rgba(0,0,0,0.05)]">

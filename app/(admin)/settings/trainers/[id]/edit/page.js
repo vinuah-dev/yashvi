@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthContext } from "@/contexts/AuthContext";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import { supabase } from "@/lib/supabaseClient";
@@ -50,7 +50,11 @@ export default function EditTrainerPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { selectedGym } = useAuthContext();
+  const { selectedGym, user: authUser } = useAuthContext();
+
+  // Deactivating a trainer has to reach the scanners too, but only when the
+  // flag actually flips — otherwise every save would re-queue device commands.
+  const initialActiveRef = useRef(null);
   const [error, setError] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -107,6 +111,8 @@ export default function EditTrainerPage({ params }) {
         .single();
 
       if (trainerError) throw trainerError;
+
+      initialActiveRef.current = trainerData.is_active ?? true;
 
       setFormData({
         firstName: trainerData.profiles?.first_name || "",
@@ -253,6 +259,28 @@ export default function EditTrainerPage({ params }) {
         .eq("id", id);
 
       if (trainerError) throw trainerError;
+
+      // The scanner opens the gate on a local match, so an inactive trainer
+      // keeps getting in until their record is removed from the device.
+      // Reactivating pushes the saved fingerprint back where one exists.
+      if (initialActiveRef.current !== null && formData.isActive !== initialActiveRef.current) {
+        try {
+          await fetch("/api/biometric/access", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-user-id": String(authUser?.id || ""),
+            },
+            body: JSON.stringify({
+              action: formData.isActive ? "unblock_trainer" : "block_trainer",
+              p_gym_id: selectedGym?.id,
+              profile_id: formData.profileId,
+            }),
+          });
+        } catch (bioErr) {
+          console.warn("Could not update device access for trainer:", bioErr);
+        }
+      }
 
       router.push(`/settings/trainers/${id}`);
     } catch (err) {

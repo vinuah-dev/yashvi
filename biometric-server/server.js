@@ -63,6 +63,21 @@ const fastify = Fastify({
 // Register form body parser (ADMS sends form-urlencoded data)
 await fastify.register(formbody);
 
+// eSSL firmwares post with whatever content-type they like: command
+// confirmations arrive as application/octet-stream, data pushes as text/plain
+// or with no content-type at all. Fastify rejects anything it has no parser
+// for with a 415, which the error handler below then turns into a 200 — so the
+// device is satisfied and never retries while the payload is dropped and the
+// route handler never runs. That silently broke command confirmations (every
+// command stuck on SENT, no Return code) and any template upload sent this way.
+//
+// Registered as a catch-all: JSON and urlencoded keep their own parsers, and
+// everything else is handed to the route as a plain string, which is what the
+// ADMS parsers in routes/adms.js expect.
+fastify.addContentTypeParser('*', { parseAs: 'string' }, (request, body, done) => {
+  done(null, body);
+});
+
 // Health check endpoint
 fastify.get('/health', async (request, reply) => {
   return { status: 'ok', timestamp: new Date().toISOString() };

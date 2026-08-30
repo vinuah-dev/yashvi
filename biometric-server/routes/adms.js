@@ -600,6 +600,52 @@ function parseStatus(statusCode) {
 }
 
 /**
+ * Pull command results out of a /iclock/devicecmd confirmation.
+ *
+ * The device replies with  ID=<n>&Return=<code>&CMD=<cmd>  and is allowed to
+ * batch several of them, one per line. ID is the numeric cmd_no we handed out
+ * in the C:<ID>:<COMMAND> reply.
+ *
+ * Some firmwares put the fields in the query string instead of the body, so
+ * both are checked.
+ */
+function parseCommandResults(body, query) {
+  const results = [];
+  const seen = new Set();
+
+  const push = (idRaw, retRaw) => {
+    const cmdNo = Number(idRaw);
+    if (!Number.isFinite(cmdNo) || seen.has(cmdNo)) return;
+    seen.add(cmdNo);
+    const returnCode = retRaw === undefined || retRaw === null || retRaw === ''
+      ? null
+      : Number(retRaw);
+    results.push({
+      cmdNo,
+      returnCode: Number.isFinite(returnCode) ? returnCode : null,
+    });
+  };
+
+  if (body && typeof body === 'string') {
+    for (const line of body.split(/[\r\n]+/)) {
+      if (!line.trim()) continue;
+      const idMatch = line.match(/\bID=(\d+)/i);
+      if (!idMatch) continue;
+      const retMatch = line.match(/\bReturn=(-?\d+)/i);
+      push(idMatch[1], retMatch ? retMatch[1] : null);
+    }
+  }
+
+  // Fallback: fields carried as query parameters.
+  if (results.length === 0 && query) {
+    const id = query.ID ?? query.id;
+    if (id !== undefined) push(id, query.Return ?? query.return ?? null);
+  }
+
+  return results;
+}
+
+/**
  * Get device serial number from request
  */
 function getDeviceSN(query) {
@@ -974,15 +1020,18 @@ export default async function admsRoutes(fastify, options) {
         return reply.code(200).send('OK');
       }
       
-      // Query for pending commands for this device AND gym
+      // Restoring a member queues one create plus one command per finger, and
+      // the device only polls every Delay seconds — handing them out one at a
+      // time would stretch a single restore over minutes. The protocol allows
+      // several commands in one reply, separated by newlines.
       const { data: commands, error } = await supabase
         .from('biometric_device_commands')
-        .select('id, command_string')
+        .select('id, cmd_no, command_string')
         .eq('gym_id', gym_id)
         .eq('device_sn', deviceSN)
         .eq('status', 'PENDING')
         .order('created_at', { ascending: true })
-        .limit(1);
+        .limit(10);
       
       if (error) {
         fastify.log.error({ msg: 'Supabase query error', error });
@@ -994,30 +1043,33 @@ export default async function admsRoutes(fastify, options) {
         return reply.code(200).send('OK');
       }
       
-      const command = commands[0];
-      
-      // Update command status to SENT
       const { error: updateError } = await supabase
         .from('biometric_device_commands')
-        .update({ 
+        .update({
           status: 'SENT',
           updated_at: new Date().toISOString()
         })
-        .eq('id', command.id);
-      
+        .in('id', commands.map((c) => c.id));
+
       if (updateError) {
         fastify.log.error({ msg: 'Failed to update command status', error: updateError });
       }
-      
-      // Return command in ADMS format: C:{ID}:{COMMAND_STRING}
-      const response = `C:${command.id}:${command.command_string}`;
-      
+
+      // ADMS format: C:{ID}:{COMMAND}. The device parses {ID} as a 64-bit
+      // integer and hands it back as ID=<n> on /iclock/devicecmd, so this must
+      // be cmd_no — the row's UUID is unparseable to the device, which silently
+      // drops the command instead of running it.
+      const response = commands
+        .map((c) => `C:${c.cmd_no}:${c.command_string}`)
+        .join('\n');
+
       fastify.log.info({
-        msg: 'Command sent to device',
-        commandId: command.id,
-        command: command.command_string
+        msg: 'Commands sent to device',
+        count: commands.length,
+        cmdNos: commands.map((c) => c.cmd_no),
+        commands: commands.map((c) => c.command_string.slice(0, 80)),
       });
-      
+
       return reply.code(200).send(response);
       
     } catch (error) {
@@ -1042,31 +1094,24 @@ export default async function admsRoutes(fastify, options) {
         body
       });
       
-      // Parse command ID from response
-      // Format can be: ID=xxx&Return=0 or C:xxx:RESULT
-      let commandId = query.ID || query.id;
-      
-      if (body && typeof body === 'string') {
-        const idMatch = body.match(/ID[=:](\S+)/i);
-        if (idMatch) {
-          commandId = idMatch[1];
-        }
-      }
-      
-      // The device reports the outcome as Return=<code>; 0 means it actually
-      // ran. Anything else (e.g. -1002 bad syntax, -1004 unsupported on this
-      // model) means the command was rejected, so it must not be recorded as
-      // a success — otherwise a member would look blocked while the gate still
-      // opens for them.
-      let returnCode = null;
-      const returnSource = `${body && typeof body === 'string' ? body : ''} ${JSON.stringify(query || {})}`;
-      const returnMatch = returnSource.match(/Return[=:"\s]+(-?\d+)/i);
-      if (returnMatch) returnCode = Number(returnMatch[1]);
+      // The device reports results as  ID=<n>&Return=<code>&CMD=<cmd>  and may
+      // batch several of them, one per line. ID is the cmd_no we put on the
+      // wire, not the row's UUID.
+      const results = parseCommandResults(body, query);
 
-      if (commandId) {
+      if (results.length === 0) {
+        fastify.log.warn({ msg: 'Command confirmation carried no ID', deviceSN, body });
+        return reply.code(200).send('OK');
+      }
+
+      for (const { cmdNo, returnCode } of results) {
+        // Return=0 means it actually ran. Anything else (e.g. -1002 bad
+        // syntax, -1004 unsupported on this model) means it was rejected and
+        // must not be recorded as success — otherwise a member looks blocked
+        // while the gate still opens for them.
         const succeeded = returnCode === null || returnCode === 0;
 
-        const { error } = await supabase
+        const { data: updated, error } = await supabase
           .from('biometric_device_commands')
           .update({
             status: succeeded ? 'SUCCESS' : 'FAILED',
@@ -1074,17 +1119,26 @@ export default async function admsRoutes(fastify, options) {
             confirmed_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           })
-          .eq('id', commandId);
+          .eq('cmd_no', cmdNo)
+          .select('id, command_string');
 
         if (error) {
-          fastify.log.error({ msg: 'Failed to update command status', error });
+          fastify.log.error({ msg: 'Failed to update command status', error, cmdNo });
+        } else if (!updated || updated.length === 0) {
+          fastify.log.warn({ msg: 'Confirmation for an unknown command', cmdNo, deviceSN });
         } else if (succeeded) {
-          fastify.log.info({ msg: '✅ Command executed on device', commandId, returnCode });
+          fastify.log.info({
+            msg: '✅ Command executed on device',
+            cmdNo,
+            returnCode,
+            command: updated[0].command_string.slice(0, 80),
+          });
         } else {
           fastify.log.warn({
             msg: '❌ Device rejected command',
-            commandId,
+            cmdNo,
             returnCode,
+            command: updated[0].command_string.slice(0, 80),
             hint: returnCode === -1004
               ? 'Not supported on this device model'
               : returnCode === -1002
@@ -1093,7 +1147,7 @@ export default async function admsRoutes(fastify, options) {
           });
         }
       }
-      
+
       return reply.code(200).send('OK');
       
     } catch (error) {
