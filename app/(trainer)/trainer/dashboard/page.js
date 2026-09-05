@@ -6,6 +6,7 @@ import {
   Apple,
   BookOpen,
   CalendarCheck,
+  Clock,
   CreditCard,
   Dumbbell,
   IndianRupee,
@@ -192,6 +193,7 @@ export default function TrainerDashboardPage() {
     () => [
       { label: "Members", detail: "Assigned clients", icon: Users, href: "/members" },
       { label: "Attendance", detail: "Mark and view", icon: CalendarCheck, href: "/attendance" },
+      { label: "My Hours", detail: "Your own punches", icon: Clock, href: "/trainer/attendance" },
       { label: "Diet Plans", detail: "Create or assign", icon: Apple, href: "/settings/diet-plans" },
       { label: "Workouts", detail: "Training plans", icon: Dumbbell, href: "/settings/workout-plans" },
       { label: "Knowledge", detail: "View gym posts", icon: BookOpen, href: "/admin/knowledge" },

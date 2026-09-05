@@ -14,7 +14,12 @@ export const POST = withAuth(async (request, { user, gymId, supabase, body }) =>
   }
   days = Math.min(90, Math.max(0, Math.round(days)));
 
-  const mode = body?.biometric_block_mode === "delete" ? "delete" : "disable";
+  // 'group' keeps the finger on the device; the other two wipe it and differ
+  // only in how access comes back on renewal.
+  const VALID_MODES = ["group", "disable", "delete"];
+  const mode = VALID_MODES.includes(body?.biometric_block_mode)
+    ? body.biometric_block_mode
+    : "group";
 
   const { error } = await supabase
     .from("gyms")

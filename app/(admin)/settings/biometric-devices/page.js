@@ -45,8 +45,8 @@ export default function BiometricDevicesPage() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ device_sn: "", device_name: "", location: "" });
-  const [access, setAccess] = useState({ graceDays: 7, blockMode: "disable" });
-  const [accessDraft, setAccessDraft] = useState({ graceDays: "7", blockMode: "disable" });
+  const [access, setAccess] = useState({ graceDays: 7, blockMode: "group" });
+  const [accessDraft, setAccessDraft] = useState({ graceDays: "7", blockMode: "group" });
   const [accessSaving, setAccessSaving] = useState(false);
 
   const call = useCallback(
@@ -247,12 +247,24 @@ export default function BiometricDevicesPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1.5">
-                What happens on renewal
+                How access is withheld
               </label>
-              <p className="text-xs text-gray-500 mb-2 leading-relaxed">
-                Blocking always removes the member from the scanner — that is the only instruction every eSSL model obeys. This setting decides how they get back in.
-              </p>
               <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setAccessDraft((d) => ({ ...d, blockMode: "group" }))}
+                  className={`w-full text-left rounded-xl border p-3 transition-all ${
+                    accessDraft.blockMode === "group"
+                      ? "border-[#f0813d] bg-[#f0813d]/5"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <p className="text-sm font-semibold text-gray-900">Move to no-access group (recommended)</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    The scanner still recognises the finger but refuses to open the gate. Nothing is erased, so renewal switches access back on instantly. Needs the one-time device setup below.
+                  </p>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setAccessDraft((d) => ({ ...d, blockMode: "disable" }))}
@@ -262,9 +274,9 @@ export default function BiometricDevicesPage() {
                       : "border-gray-200 bg-white"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-gray-900">Restore automatically (recommended)</p>
+                  <p className="text-sm font-semibold text-gray-900">Remove, restore from backup</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    The saved fingerprint is pushed back to the device on renewal, so the member never touches the scanner again. Needs a backed-up finger — check Diagnostics.
+                    Deletes the user from the scanner and pushes the saved fingerprint back on renewal. Only works if the device uploads templates — check Diagnostics first.
                   </p>
                 </button>
 
@@ -277,12 +289,24 @@ export default function BiometricDevicesPage() {
                       : "border-gray-200 bg-white"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-gray-900">Enroll again on the machine</p>
+                  <p className="text-sm font-semibold text-gray-900">Remove, enroll again</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Staff takes the member&apos;s fingerprint on the device again after renewal. Works on every scanner, but needs someone at the machine.
+                    Deletes the user from the scanner. Staff takes the fingerprint again after renewal. Works on every device, but needs someone at the machine.
                   </p>
                 </button>
               </div>
+
+              {accessDraft.blockMode === "group" && (
+                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-xs font-bold text-amber-900 mb-1">One-time setup on the scanner</p>
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    On the device: <span className="font-semibold">Menu → Access Control → Access Group Settings</span>.
+                    Leave <span className="font-semibold">Group 1</span> as the normal group with access, and set{" "}
+                    <span className="font-semibold">Group 2</span> with no valid time zone. Until Group 2 is set up this
+                    way the scanner will keep opening the gate for blocked members.
+                  </p>
+                </div>
+              )}
             </div>
 
             <button

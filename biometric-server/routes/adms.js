@@ -234,7 +234,13 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
 
     const graceDaysRaw = Number(gym?.biometric_grace_days);
     const graceDays = Number.isFinite(graceDaysRaw) && graceDaysRaw >= 0 ? graceDaysRaw : 7;
-    const blockMode = gym?.biometric_block_mode === 'delete' ? 'delete' : 'disable';
+    // 'group' is the default: it withholds access without wiping the finger,
+    // which is the only thing that survives a renewal on a device that never
+    // uploads its templates.
+    const VALID_MODES = ['group', 'disable', 'delete'];
+    const blockMode = VALID_MODES.includes(gym?.biometric_block_mode)
+      ? gym.biometric_block_mode
+      : 'group';
 
     if (expiryDate) {
       const cutoff = new Date(expiryDate);
@@ -261,17 +267,25 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
 
     if (!devices || devices.length === 0) return;
 
-    // Removing the user record is the only command every eSSL firmware
-    // honours. There is no Enabled/Disabled field in the ADMS USERINFO set —
-    // that bit only exists in the binary SDK on port 4370 — so an "update the
-    // user and hope the device refuses them" command is accepted with
-    // Return=0 and changes nothing, leaving the gate open for an expired
-    // member who shows as blocked in the dashboard.
+    // Two ways to withhold access:
     //
-    // blockMode therefore decides what happens on RENEWAL, not now:
-    //   'disable' -> the saved fingerprint is pushed back, no re-enrollment
-    //   'delete'  -> staff enrolls the finger again on the machine
-    const commandString = `DATA DELETE USERINFO PIN=${member.biometric_uid}`;
+    //   'group'  move the user into the device's no-access group. The finger
+    //            stays enrolled, so a renewal is one command and needs no
+    //            template backup. Requires group 2 to be configured on the
+    //            scanner with no valid time zone, otherwise it does nothing.
+    //
+    //   others   delete the user record. Works on every firmware, but wipes
+    //            the enrolled finger with it.
+    const TAB = '\t';
+    const commandString =
+      blockMode === 'group'
+        ? [
+            `DATA UPDATE USERINFO PIN=${member.biometric_uid}`,
+            `Name=${member.full_name || ''}`,
+            `Pri=0`,
+            `Grp=2`,
+          ].join(TAB)
+        : `DATA DELETE USERINFO PIN=${member.biometric_uid}`;
 
     // Only meaningful for 'disable'. Recorded so staff can be warned at
     // renewal time instead of discovering it at the gate.
@@ -283,6 +297,8 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
 
     const hasBackup = (templateCount || 0) > 0;
 
+    // Group mode leaves the finger on the device, so a missing backup is only
+    // a problem for the modes that delete it.
     if (blockMode === 'disable' && !hasBackup) {
       logger.warn({
         msg: '⚠️ No fingerprint backup for this member — renewal will need re-enrollment',
@@ -319,7 +335,7 @@ async function blockExpiredMemberOnDevices(gymId, memberId, expiryDate, logger) 
       biometric_uid: member.biometric_uid,
       mode: blockMode,
       devices: rows.length,
-      restoreOnRenewal: blockMode === 'disable' && hasBackup,
+      restoreOnRenewal: blockMode === 'group' || (blockMode === 'disable' && hasBackup),
     });
   } catch (e) {
     logger.error({ msg: 'Exception in blockExpiredMemberOnDevices', error: e.message });

@@ -41,7 +41,7 @@ export default function TrainerAttendanceQuickPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canCreateTrainer, loading: roleLoading } = useUserRole();
-  const { selectedGym } = useAuthContext();
+  const { selectedGym, user: authUser } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [trainers, setTrainers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,7 +111,10 @@ export default function TrainerAttendanceQuickPage() {
     try {
       const response = await fetch("/api/trainers/attendance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({
           p_gym_id: selectedGym.id,
           p_trainer_id: trainerId,
@@ -138,7 +141,7 @@ export default function TrainerAttendanceQuickPage() {
     } finally {
       setAttendanceLoading(false);
     }
-  }, [selectedGym?.id]);
+  }, [selectedGym?.id, authUser?.id]);
 
   useEffect(() => {
     setAttendanceDrafts(buildAttendanceDrafts(attendanceData.attendance_days || []));

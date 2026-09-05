@@ -4,20 +4,41 @@ import { blockViewOnlyWrites } from "@/lib/server/viewOnlyGuard";
 import {
   blockMemberOnDevices,
   unblockMemberOnDevices,
+  blockUidOnDevices,
   restoreUidOnDevices,
-  hasStoredTemplates,
   queueCommandForGym,
   buildDeleteUserCommand,
 } from "@/lib/server/biometricCommands";
 
-// Controls whether a member's fingerprint can still open the gate.
+// Controls whether a member's or trainer's fingerprint still opens the gate.
 //
 // The F22 matches locally and opens the gate before the server hears about it,
-// so access is changed by pushing a command to the device. By default that's a
-// "disable" (the enrolled finger stays on the device), which means a renewal
-// can switch access back on instantly instead of re-enrolling.
+// so access is changed by pushing a command to the device. Which command that
+// is comes from the gym's block mode: by default the user is moved into the
+// scanner's no-access group, which withholds entry while leaving the enrolled
+// finger in place so a renewal is a single command.
 export const POST = withAuth(async (request, { user, gymId, supabase, body }) => {
   const action = body?.action;
+
+  // ── Read the gym's current access rules ──
+  // The settings screen loads through here; without it the page silently fell
+  // back to defaults and showed the wrong mode whatever was actually saved.
+  if (action === "settings") {
+    const { data: gym } = await supabase
+      .from("gyms")
+      .select("biometric_grace_days, biometric_block_mode")
+      .eq("id", gymId)
+      .maybeSingle();
+
+    const days = Number(gym?.biometric_grace_days);
+
+    return NextResponse.json({
+      data: {
+        graceDays: Number.isFinite(days) ? days : 7,
+        blockMode: gym?.biometric_block_mode || "group",
+      },
+    });
+  }
 
   const writeBlocked = await blockViewOnlyWrites(request, supabase, user.id);
   if (writeBlocked) return writeBlocked;
@@ -108,13 +129,17 @@ export const POST = withAuth(async (request, { user, gymId, supabase, body }) =>
       );
     }
 
+    const name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
+
     if (action === "block_trainer") {
-      const backedUp = await hasStoredTemplates(supabase, gymId, uid);
-      const devices = await queueCommandForGym(supabase, gymId, buildDeleteUserCommand(uid));
-      return NextResponse.json({ success: true, devices, backedUp });
+      const result = await blockUidOnDevices(supabase, gymId, uid, name);
+      return NextResponse.json({
+        success: true,
+        devices: result.queued,
+        backedUp: result.backedUp,
+      });
     }
 
-    const name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
     const result = await restoreUidOnDevices(supabase, gymId, uid, name);
     return NextResponse.json({
       success: true,

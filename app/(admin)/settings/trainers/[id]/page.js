@@ -105,7 +105,7 @@ export default function TrainerDetailsPage({ params }) {
   const [assignedMembers, setAssignedMembers] = useState([]);
   const [activityLog, setActivityLog] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { selectedGym } = useAuthContext();
+  const { selectedGym, user: authUser } = useAuthContext();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "members");
   const [unassignMember, setUnassignMember] = useState(null);
   const [unassigning, setUnassigning] = useState(false);
@@ -309,7 +309,10 @@ export default function TrainerDetailsPage({ params }) {
     try {
       const response = await fetch("/api/trainers/attendance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({
           p_gym_id: selectedGym.id,
           p_trainer_id: id,
