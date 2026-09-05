@@ -38,7 +38,7 @@ const ACTIONS = [
   {
     label: "Trainer Att.",
     icon: <UserCheck className="w-4 h-4" />,
-    href: "/settings/trainers/attendance",
+    href: "/attendance",
     permission: PERMISSIONS.SETTINGS,
     adminOnly: true,
     photo: "/quick-actions/trainer-attendance.png",

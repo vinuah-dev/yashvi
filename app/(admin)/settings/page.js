@@ -107,14 +107,6 @@ const settingsSections = [
     color: "from-[#f0813d] to-[#9c4400]"
   },
   {
-    id: "trainers",
-    title: "Trainers",
-    description: "Manage trainers, plans & member assignments",
-    icon: Shield,
-    href: "/settings/trainers",
-    color: "from-[#f0813d] to-[#9c4400]"
-  },
-  {
     id: "amenities",
     title: "Gym Amenities",
     description: "Locker, towel, parking & other amenities",
@@ -188,7 +180,7 @@ export default function SettingsPage() {
       return !['plans', 'diet-plans', 'workout-plans'].includes(section.id);
     }
     if (!canCreateTrainer) {
-      return !['gym', 'plans', 'trainers'].includes(section.id);
+      return !['gym', 'plans'].includes(section.id);
     }
     return true;
   });

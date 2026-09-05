@@ -18,7 +18,7 @@ import Header from "@/components/layout/Header";
 // row shows first-in / last-out.
 //
 // This screen is the trainer's own view of that — the admin equivalent lives at
-// /settings/trainers/attendance.
+// /attendance (Trainer tab).
 
 const getStoredTrainer = () => {
   if (typeof window === "undefined") return null;

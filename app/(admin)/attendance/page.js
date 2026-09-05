@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Header from "@/components/layout/Header";
 import { DateBandInput } from "@/components/shared/EngagingFormControls";
 import { AttendancePageSkeleton } from "@/components/shared/Skeleton";
+import TrainerAttendanceView from "@/components/shared/TrainerAttendanceView";
 import { 
   Search, 
   User, 
@@ -31,7 +32,44 @@ const toLocalDateInputValue = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+// Member and trainer attendance live on this one screen; the switch picks
+// which. Trainer attendance used to sit under Settings, which meant leaving
+// this page to reach it.
+function AttendanceTypeSwitch({ view, onChange }) {
+  return (
+    <section className="mx-1 bg-white rounded-[22px] p-1.5 border border-[#ececec] shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
+      <div className="grid grid-cols-2 gap-1">
+        <button
+          type="button"
+          onClick={() => onChange("members")}
+          className={`flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition-all ${
+            view === "members"
+              ? "bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white shadow-sm"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          Member
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange("trainers")}
+          className={`flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition-all ${
+            view === "trainers"
+              ? "bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white shadow-sm"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          <UserCheck className="w-4 h-4" />
+          Trainer
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export default function AttendancePage() {
+  const [view, setView] = useState("members");
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(
     toLocalDateInputValue(new Date())
@@ -361,6 +399,20 @@ export default function AttendancePage() {
     }
   };
 
+  // The trainer view loads its own data, so it renders before the member
+  // loading gate — switching stays instant while members are still loading.
+  if (view === "trainers") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 safe-area-inset-bottom">
+        <Header title="Attendance" showBack={false} />
+        <main className="px-3 md:px-8 lg:px-12 py-3 md:py-6 max-w-7xl mx-auto w-full">
+          <AttendanceTypeSwitch view={view} onChange={setView} />
+        </main>
+        <TrainerAttendanceView showHeader={false} />
+      </div>
+    );
+  }
+
   if (loading) {
     return <AttendancePageSkeleton />;
   }
@@ -396,27 +448,7 @@ export default function AttendancePage() {
       <Header title="Attendance" showBack={false} />
 
       <main className="px-3 md:px-8 lg:px-12 py-3 md:py-6 space-y-4 max-w-7xl mx-auto w-full">
-        {/* Attendance Type Switcher */}
-        <section className="mx-1 bg-white rounded-[22px] p-1.5 border border-[#ececec] shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
-          <div className="grid grid-cols-2 gap-1">
-            <button
-              type="button"
-              onClick={() => router.push("/attendance")}
-              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gradient-to-r from-[#f0813d] to-[#9c4400] text-white shadow-sm transition-all"
-            >
-              <Users className="w-4 h-4" />
-              Member
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/settings/trainers/attendance")}
-              className="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
-            >
-              <UserCheck className="w-4 h-4" />
-              Trainer
-            </button>
-          </div>
-        </section>
+        <AttendanceTypeSwitch view={view} onChange={setView} />
 
         {/* Date Selector - Premium Calendar Band */}
         <section className="mx-1 overflow-hidden rounded-[1.75rem] border border-[#f0813d]/30 bg-white shadow-[0_18px_45px_rgba(26,28,28,0.08)]">

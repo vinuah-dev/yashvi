@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   Users,
+  UserCog,
   CalendarCheck,
   Megaphone,
   CreditCard,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { usePermissions } from "@/lib/hooks/usePermissions";
+import { useUserRole } from "@/lib/hooks/useUserRole";
 import { hasPermission, PERMISSIONS } from "@/lib/constants/permissions";
 
 const allAdminNavItems = [
@@ -35,6 +37,16 @@ const allAdminNavItems = [
     label: "Members",
     icon: <Users className="w-[1.2rem] h-[1.2rem]" />,
     permission: PERMISSIONS.MEMBERS,
+  },
+  {
+    href: "/trainers",
+    label: "Trainers",
+    icon: <UserCog className="w-[1.2rem] h-[1.2rem]" />,
+    permission: PERMISSIONS.SETTINGS,
+    // Trainers used to sit inside Settings, gated by canCreateTrainer. Keeping
+    // that gate here means promoting it to the main nav doesn't hand trainer
+    // management to anyone who couldn't already reach it.
+    requiresTrainerAccess: true,
   },
   {
     href: "/attendance",
@@ -151,6 +163,7 @@ const customerNavItems = [
 export default function BottomNav({ role = "admin" }) {
   const pathname = usePathname();
   const { permissions } = usePermissions();
+  const { canCreateTrainer } = useUserRole();
 
   const getNavItems = () => {
     switch (role) {
@@ -163,12 +176,16 @@ export default function BottomNav({ role = "admin" }) {
 
       case "admin":
       case "owner":
-        if (!permissions) return allAdminNavItems;
+        if (!permissions) {
+          return allAdminNavItems.filter(
+            (item) => !item.requiresTrainerAccess || canCreateTrainer,
+          );
+        }
 
         return allAdminNavItems.filter(
           (item) =>
-            !item.permission ||
-            hasPermission(permissions, item.permission)
+            (!item.permission || hasPermission(permissions, item.permission)) &&
+            (!item.requiresTrainerAccess || canCreateTrainer)
         );
 
       default:
