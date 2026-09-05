@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
-import { withApi } from "@/lib/server/apiMiddleware";
+import { withAuth } from "@/lib/server/apiMiddleware";
 
-export const POST = withApi(async (request, { supabase }) => {
-  const { p_member_id, p_gym_id } = await request.json();
+// Returns a member's full record including payments and dues, so the gym is
+// taken from the authenticated caller rather than the request body.
+export const POST = withAuth(async (request, { gymId, supabase, body }) => {
+  const memberId = body?.p_member_id;
 
-  if (!p_member_id || !p_gym_id) {
-    return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
+  if (!memberId) {
+    return NextResponse.json({ error: "Missing p_member_id" }, { status: 400 });
   }
 
   const { data, error } = await supabase.rpc("get_member_details", {
-    p_member_id,
-    p_gym_id,
+    p_member_id: memberId,
+    p_gym_id: gymId,
   });
 
   if (error) {

@@ -127,7 +127,10 @@ export default function MemberDetailPage() {
       try {
         const res = await fetch('/api/members/details', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': String(JSON.parse(localStorage.getItem('gymUser') || '{}')?.id || ''),
+          },
           body: JSON.stringify({ p_member_id: memberId, p_gym_id: gymId }),
         });
         const json = await res.json();

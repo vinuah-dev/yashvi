@@ -459,7 +459,10 @@ export default function MembersPage() {
       try {
         const res = await fetch("/api/members/stats", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": String(user?.id || ""),
+          },
           body: JSON.stringify({
             p_gym_id: selectedGym.id,
             p_user_id: user?.id || null,

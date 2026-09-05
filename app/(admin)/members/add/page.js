@@ -123,7 +123,12 @@ export default function AddMemberPage() {
       let plans = null;
       let error = null;
       try {
-        const res = await fetch(`/api/members/plans?gym_id=${gymId}`);
+        const res = await fetch(`/api/members/plans?gym_id=${gymId}`, {
+          headers: {
+            "x-user-id": String(JSON.parse(localStorage.getItem("gymUser") || "{}")?.id || ""),
+            "x-gym-id": String(gymId || ""),
+          },
+        });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'API error');
         plans = json.plans;

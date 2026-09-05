@@ -77,7 +77,10 @@ export default function TrainersView({ showHeader = true }) {
       // Single RPC call replaces 6+ separate queries
       const response = await fetch("/api/trainers/list", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ p_gym_id: selectedGym.id }),
       });
 
@@ -119,7 +122,7 @@ export default function TrainersView({ showHeader = true }) {
     } finally {
       setLoading(false);
     }
-  }, [selectedGym?.id]);
+  }, [selectedGym?.id, authUser?.id]);
 
   const fetchPtShare = useCallback(async () => {
     if (!selectedGym?.id) return;
@@ -141,7 +144,7 @@ export default function TrainersView({ showHeader = true }) {
     } catch {
       // keep default 50
     }
-  }, [selectedGym?.id]);
+  }, [selectedGym?.id, authUser?.id]);
 
   const savePtShare = async () => {
     if (!selectedGym?.id) return;
@@ -180,7 +183,10 @@ export default function TrainersView({ showHeader = true }) {
     try {
       const response = await fetch("/api/trainers/payroll", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({
           p_gym_id: selectedGym.id,
           p_month: `${payrollMonth}-01`,
@@ -205,7 +211,7 @@ export default function TrainersView({ showHeader = true }) {
     } finally {
       setPayrollLoading(false);
     }
-  }, [selectedGym?.id, payrollMonth]);
+  }, [selectedGym?.id, payrollMonth, authUser?.id]);
 
   useEffect(() => {
     if (!selectedGym?.id) return;

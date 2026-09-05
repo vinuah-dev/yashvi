@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
-import { withApi } from "@/lib/server/apiMiddleware";
+import { withAuth } from "@/lib/server/apiMiddleware";
 
-export const POST = withApi(async (request, { supabase }) => {
-  const { p_gym_id, p_month } = await request.json();
-
-  if (!p_gym_id) {
-    return NextResponse.json({ error: "Missing p_gym_id" }, { status: 400 });
+// Whole-gym salary and PT payouts. The gym is taken from the authenticated
+// caller, and trainers are kept out entirely — this is an owner/staff screen.
+export const POST = withAuth(async (request, { user, gymId, supabase, body }) => {
+  if (user.role === "trainer") {
+    return NextResponse.json(
+      { error: "Not allowed to view gym payroll" },
+      { status: 403 },
+    );
   }
+
+  const p_gym_id = gymId;
+  const p_month = body?.p_month;
 
   const { data, error } = await supabase.rpc("get_trainer_payroll_dashboard", {
     p_gym_id,

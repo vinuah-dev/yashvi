@@ -66,7 +66,10 @@ export default function TrainerAttendanceQuickPage() {
     try {
       const response = await fetch("/api/trainers/list", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ p_gym_id: selectedGym.id }),
       });
 
@@ -103,7 +106,7 @@ export default function TrainerAttendanceQuickPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchParams, selectedGym?.id, selectedTrainerId]);
+  }, [searchParams, selectedGym?.id, selectedTrainerId, authUser?.id]);
 
   const fetchAttendanceSummary = useCallback(async (trainerId, monthValue) => {
     if (!selectedGym?.id || !trainerId) return;

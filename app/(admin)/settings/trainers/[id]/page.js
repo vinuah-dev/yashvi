@@ -158,7 +158,10 @@ export default function TrainerDetailsPage({ params }) {
       // Single RPC call replaces 8+ separate queries
       const response = await fetch("/api/trainers/details", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ p_trainer_id: id, p_gym_id: selectedGym.id }),
       });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 function formatExportDate(value) {
   if (!value) return "";
@@ -20,6 +21,8 @@ function formatExportMonth(value) {
 
 export function useExcelExport(selectedGym) {
   const [exporting, setExporting] = useState(false);
+  // The export endpoint authenticates the caller, so it needs the user id.
+  const { user: authUser } = useAuthContext();
 
   const exportExcel = useCallback(async () => {
     if (!selectedGym?.id || !selectedGym?.name) {
@@ -33,7 +36,10 @@ export function useExcelExport(selectedGym) {
 
       const res = await fetch("/api/dashboard/export", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": String(authUser?.id || ""),
+        },
         body: JSON.stringify({ p_gym_id: selectedGym.id }),
       });
 
@@ -240,7 +246,7 @@ export function useExcelExport(selectedGym) {
     } finally {
       setExporting(false);
     }
-  }, [selectedGym]);
+  }, [selectedGym, authUser?.id]);
 
   return { exporting, exportExcel };
 }
