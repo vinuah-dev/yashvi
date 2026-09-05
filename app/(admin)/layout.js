@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   Users,
+  UserCog,
   CalendarCheck,
   CreditCard,
   ShoppingBag,
@@ -22,6 +23,10 @@ import { useAuthContext } from "@/contexts/AuthContext";
 const desktopNavItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: Home },
   { href: "/members", label: "Members", icon: Users },
+  // Trainers used to live inside Settings, gated by canCreateTrainer. Keeping
+  // that gate here means promoting it to the main nav doesn't hand trainer
+  // management to anyone who couldn't already reach it.
+  { href: "/trainers", label: "Trainers", icon: UserCog, requiresTrainerAccess: true },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck },
   { href: "/finance", label: "Finance", icon: CreditCard },
   { href: "/admin/shop", label: "Shop", icon: ShoppingBag },
@@ -31,6 +36,11 @@ const desktopNavItems = [
 
 function DesktopSidebar() {
   const pathname = usePathname();
+  const { canCreateTrainer } = useAuthContext();
+
+  const navItems = desktopNavItems.filter(
+    (item) => !item.requiresTrainerAccess || canCreateTrainer,
+  );
 
   return (
     <aside className="hidden md:flex fixed left-0 top-0 h-screen w-72 bg-white border-r border-[#ececec] shadow-[10px_0_40px_rgba(0,0,0,0.04)] flex-col z-40">
@@ -47,7 +57,7 @@ function DesktopSidebar() {
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
-        {desktopNavItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const active =
             pathname === item.href ||
